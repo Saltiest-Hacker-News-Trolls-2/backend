@@ -81,11 +81,10 @@ On Success: Returns an object containing a token, as well as the following user 
 
 Parameters:
 
-| Parameter Name | Location   | Type   | Required |
-| -------------- | ---------- | ------ | -------- |
-| username       | req.body   | string | yes      |
-| password       | req.body   | string | yes      |
-| token          | req.header | string | yes      |
+| Parameter Name | Location | Type   | Required |
+| -------------- | -------- | ------ | -------- |
+| username       | req.body | string | yes      |
+| password       | req.body | string | yes      |
 
 Example Request:
 
@@ -93,22 +92,18 @@ req.body
 
 ```
 {
-    username: "johnsmith",
-    password: "testpassword"
-}
-```
-
-req.header
-
-```
-{
-    authorization: "fjbifjlbia4335.4534vsla32w.fwlfj4sfsarasafd8",
+    username: "salty_Dud3",
+    password: "n4J3%Lp",
 }
 ```
 
 Example Response:
 
-TODO
+```
+{
+    token: "fjbifjlbia4335.4534vsla32w.fwlfj4sfsarasafd8",
+}
+```
 
 Possible Errors:
 
