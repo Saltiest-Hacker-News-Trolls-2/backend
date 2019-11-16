@@ -9,7 +9,7 @@ test('Environment should be "test"', () => {
   expect(process.env.NODE_ENV).toBe('test')
 })
 
-describe('Tests for /user/register', () => {
+describe('Tests for /register', () => {
   beforeEach(async () => {
     // clear database
     await db('users').truncate()
@@ -19,7 +19,7 @@ describe('Tests for /user/register', () => {
     test.todo('should allow duplicates')
   })
 
-  describe('Tests for /user/login', () => {
+  describe('Tests for /login', () => {
     beforeEach(async () => {
       // clear database
       await db('users').truncate()

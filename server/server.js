@@ -3,22 +3,26 @@ const helmet = require('helmet')
 const cors = require('cors')
 const morgan = require('morgan')
 
-const helpMessage = require('./helpMessage')
+const { available_routes } = require('./helpMessage')
 
 const server = express()
 
 // middleware
 server.use(express.json(), helmet(), cors(), morgan('dev'))
 
+//custom middlweare
+const { restrictJWT } = require('../middleware')
+
 // Routes
-const { usersRoutes } = require('../routes')
+const { usersRoutes, onboardingRoutes } = require('../routes')
 
 // route handlers
-server.use('/api/users', usersRoutes)
+server.use('/api/', onboardingRoutes)
+server.use('/api/users', restrictJWT, usersRoutes)
 
 // route not found
 server.use((req, res) => {
-  res.status(404).json({ no_route: req.originalUrl, helpMessage })
+  res.status(404).json({ available_routes })
 })
 
 module.exports = server

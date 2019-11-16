@@ -3,6 +3,10 @@ const bcrypt = require('bcryptjs')
 
 const { allPurpose: kxa } = require('../db/dml')
 
-router.get('/', (req, res) => {})
+const generateJWT = require('../jwt/generateJWT')
+
+router.post('/register', (req, res) => {})
+
+router.post('/login', (req, res) => {})
 
 module.exports = router
