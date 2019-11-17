@@ -10,15 +10,12 @@ const server = express()
 // middleware
 server.use(express.json(), helmet(), cors(), morgan('dev'))
 
-//custom middlweare
-const { restrictJWT } = require('../middleware')
-
 // Routes
 const { usersRoutes, onboardingRoutes } = require('../routes')
 
 // route handlers
-server.use('/api/', onboardingRoutes)
-server.use('/api/users', restrictJWT, usersRoutes)
+server.use('/api', onboardingRoutes)
+server.use('/api/users', usersRoutes)
 
 // route not found
 server.use((req, res) => {

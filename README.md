@@ -20,7 +20,7 @@ TODO
 - create two databases on your local device 'saltiest' and 'saltiest-test'
 - `createdb saltiest && createdb saltiest-test`
 - use the command `npm run dev` to run the server locally using the 'development' environment settings
-- use the command '
+- use the command `npm run test` to run the test files using the 'test' environment settings
 
 ## Endpoints
 
