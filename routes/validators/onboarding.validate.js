@@ -10,10 +10,10 @@ function validateLogin() {
   return [
     body('username')
       .exists()
-      .withMessage('Username and Password are required to login.'),
+      .withMessage('Username and Password are required to log in.'),
     body('password')
       .exists()
-      .withMessage('Username and Password are required to login.')
+      .withMessage('Username and Password are required to log in.')
     // search for user and compare password
   ]
 }

@@ -29,13 +29,13 @@ Quick Links: [Users Overview](#users-overview) | [Comments Overview](#comments-o
 
 ### Users Overview
 
-| Method | Endpoint          | Requires                                                              | Description                                                      |
-| ------ | ----------------- | --------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| POST   | `/api/register/`  | `email address`- req.body, `username`- req.body, `password`- req.body | Used for adding a new user to the database. Returns a JWT token. |
-| POST   | `/api/login/`     | `username` - req.body, `password`- req.body                           | Used to log a user in. Returns a token containing the user's id. |
-| GET    | `/api/users/:id/` | Successful Login                                                      | Used to show details of a specific user.                         |
-| PUT    | `/api/users/:id/` | Successful Login                                                      | Used to update the information of the user currently logged in.  |
-| DELETE | `/api/users/:id/` | Successful Login                                                      | Used to delete the user that is currently logged in.             |
+| Method | Endpoint          | Requires                                                              | Description                                                                                         |
+| ------ | ----------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| POST   | `/api/register/`  | `email address`- req.body, `username`- req.body, `password`- req.body | Used for adding a new user to the database. Returns an object containing user data and a JWT token. |
+| POST   | `/api/login/`     | `username` - req.body, `password`- req.body                           | Used to log a user in. Returns an object containing user data and a JWT token.                      |
+| GET    | `/api/users/:id/` | Successful Login                                                      | Used to show details of a specific user.                                                            |
+| PUT    | `/api/users/:id/` | Successful Login                                                      | Used to update the information of the user currently logged in.                                     |
+| DELETE | `/api/users/:id/` | Successful Login                                                      | Used to delete the user that is currently logged in.                                                |
 
 ---
 
@@ -43,7 +43,7 @@ Quick Links: [Users Overview](#users-overview) | [Comments Overview](#comments-o
 
 Method used: **[POST]** `/api/register`
 
-On Success: Returns the Id of the new user and a JWT token.
+On Success: Returns an object containing user data and a JWT token.
 
 Parameters:
 
@@ -65,7 +65,14 @@ Example Request:
 
 Example Response:
 
-TODO
+```
+{
+    username: "salty_Dud3",
+    id: 1,
+    favorites: [],
+    token: "fjbifjlbia4335.4534vsla32w.fwlfj4sfsarasafd8",
+}
+```
 
 Possible Errors:
 
@@ -101,12 +108,48 @@ Example Response:
 
 ```
 {
+    username: "salty_Dud3",
+    id: 1,
+    favorites: [
+      {
+      "id": 5493,
+      "commenter_name": "Mr.Salty",
+      "comment": " I hate puppies",
+      "rating": 56.4345,
+      "commenter_id": 402830
+    },
+    {
+      "id": 2770,
+      "commenter_name": "Mr.Salty",
+      "comment": "Everybody on this forum sucks",
+      "rating": 12.71,
+      "commenter_id": 402830
+    }
+    ],
     token: "fjbifjlbia4335.4534vsla32w.fwlfj4sfsarasafd8",
 }
 ```
 
 Possible Errors:
 
-TODO
+Invalid Username and/or Password
+
+```
+{
+    "errors": [
+        "Invalid Credentials"
+    ]
+}
+```
+
+No Username and/or Password in req.body
+
+```
+{
+    "errors": [
+        "Username and Password are required to log in."
+    ]
+}
+```
 
 ---
