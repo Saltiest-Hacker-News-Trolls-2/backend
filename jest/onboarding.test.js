@@ -5,7 +5,7 @@ const db = require('../db/db_interface')
 const baseURL = '/api'
 const testUser = {
   username: 'Ned',
-  email: 'ned@mail.ned',
+  email: 'ned@mail.com',
   password: 'abc?123'
 }
 const hashed = '$2a$12$QAKFHsSTGOSLASd7mUhiCeQFcUTxD4ObQnfomm0g32oXsN8gBOqpi'
@@ -46,10 +46,86 @@ describe('Tests for onboarding process', () => {
       expect(res.body.token).toBeDefined()
       // assert database was updated
     })
+
+    test('Should return error if username is not provided', () => {
+      return request(app)
+        .post(`${baseURL}/register`)
+        .send({ password: 'abc?123', email: 'n@n.com' })
+        .then(res => {
+          expect(res.status).toBe(422)
+          expect(res.body.errors.length).toBe(1)
+        })
+    })
+
+    test('Should return error if username contains invalid characters', () => {
+      return request(app)
+        .post(`${baseURL}/register`)
+        .send({
+          password: 'abc?123',
+          email: 'n@n.com',
+          username: 'bad username'
+        })
+        .then(res => {
+          expect(res.status).toBe(422)
+          expect(res.body.errors.length).toBe(1)
+        })
+    })
+
+    test('Should return error if password is not provided', () => {
+      return request(app)
+        .post(`${baseURL}/register`)
+        .send({ username: 'joe', email: 'n@n.com' })
+        .then(res => {
+          expect(res.status).toBe(422)
+          expect(res.body.errors.length).toBe(1)
+        })
+    })
+
+    test('Should return error if email is not provided', () => {
+      return request(app)
+        .post(`${baseURL}/register`)
+        .send({ username: 'joe', password: 'abc?123' })
+        .then(res => {
+          expect(res.status).toBe(422)
+          expect(res.body.errors.length).toBe(1)
+        })
+    })
+
+    test('Should return error if email is not a valid format', () => {
+      return request(app)
+        .post(`${baseURL}/register`)
+        .send({ username: 'joe', password: 'abc?123', email: 'bbb' })
+        .then(res => {
+          expect(res.status).toBe(422)
+          expect(res.body.errors[0]).toMatch(
+            /please provide a valid email address/i
+          )
+        })
+    })
+
+    test('Should not allow duplicate usernames', async () => {
+      //db should be empty
+      db('users').then(res => expect(res.length).toBe(0))
+
+      // add user to db
+      db('users')
+        .insert(testUser)
+        .then(res => expect(res.length).toBe(1))
+      // try to add user again
+      const res = await request(app)
+        .post(`${baseURL}/register`)
+        .send(testUser)
+      // assert correct response
+      expect(res.status).toBe(400)
+      expect(res.body.errors[0]).toMatch(
+        /sorry, that username is unavailable./i
+      )
+    })
+
     test.todo('validate param format')
     test.todo('should not allow duplicate usernames')
     test.todo('should not allow duplicate emails')
-  })
+  }) // end test for register
 
   describe('Tests for /login', () => {
     beforeEach(async () => {
