@@ -66,5 +66,22 @@ describe('Tests for onboarding process', () => {
     })
     test.todo('should return token if password is correct')
     test.todo('should return errror if password is incorrect')
+    test('Should return error if username is missing', async () => {
+      return request(app)
+        .post(`${baseURL}/login`)
+        .send({ password: testUser.password })
+        .then(res => {
+          expect(res.status).toBe(422)
+        })
+    })
+
+    test('Should return error if password is missing', async () => {
+      return request(app)
+        .post(`${baseURL}/login`)
+        .send({ username: testUser.username })
+        .then(res => {
+          expect(res.status).toBe(422)
+        })
+    })
   })
 })
