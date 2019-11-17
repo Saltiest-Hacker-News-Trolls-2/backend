@@ -6,7 +6,16 @@ const handleValidationErr = (req, res, next) => {
     return next()
   }
 
-  return res.status(422).json(errors.mapped())
+  const formatted = errors.errors.reduce((errs, err) => {
+    if (!errs.includes(err.msg)) {
+      errs.push(err.msg)
+      return errs
+    } else {
+      return errs
+    }
+  }, [])
+
+  return res.status(422).json({ errors: formatted })
 }
 
 module.exports = handleValidationErr

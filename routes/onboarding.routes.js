@@ -36,29 +36,26 @@ router.post(
     try {
       const { username, password } = req.body
       // validate password
-      const { password: hashed, id } = await kxa.getOneBy(
-        { username },
-        'users',
-        ['password', 'id']
-      )
+      // const { password: hashed, id } = await kxa.getOneBy(
+      const dbResult = await kxa.getOneBy({ username }, 'users', [
+        'password',
+        'id'
+      ])
 
-      if (hashed && bcrypt.compareSync(password, hashed)) {
+      if (dbResult && bcrypt.compareSync(password, dbResult.password)) {
         // get user's favorites
         const favorites = []
         // generate token
-        const token = generateJWT({ id })
+        const token = generateJWT({ dbResult })
         // return token
-        res.status(200).json({ username, favorites, id, token })
+        res.status(200).json({ username, favorites, id: dbResult.id, token })
         return
       }
-
-      throw new Error('invalidcredentials')
+      // return error if username or password is incorrect
+      next({ type: 'INVALIDCRED' })
     } catch (err) {
-      let type = null
-      if (err.message === 'invalidcredentials') {
-        type = 'INVALIDCRED'
-      }
-      next({ type })
+      console.log({ err })
+      next({ ...err })
     }
   }
 )

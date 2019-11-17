@@ -87,7 +87,45 @@ describe('Tests for onboarding process', () => {
       expect(loginResult.body.token).toBeDefined()
     })
 
-    test.todo('should return errror if password is incorrect')
+    test('Should return error if password is incorrect', async () => {
+      // add user to db
+      await db('users').insert({ ...testUser, password: hashed })
+      // check that user was added to db
+      let isInDB = await db('users')
+        .where('username', testUser.username)
+        .first()
+      expect(isInDB.username).toMatch(/ned/i)
+
+      // try to login
+      return request(app)
+        .post(`${baseURL}/login`)
+        .send({ username: testUser.username, password: 'dog' })
+        .then(res => {
+          expect(res.status).toBe(400)
+          expect(res.body.errors.length).toBe(1)
+          expect(res.body.errors[0]).toMatch(/invalid credentials./i)
+        })
+    })
+
+    test('Should return error if username is incorrect', async () => {
+      // add user to db
+      await db('users').insert({ ...testUser, password: hashed })
+      // check that user was added to db
+      let isInDB = await db('users')
+        .where('username', testUser.username)
+        .first()
+      expect(isInDB.username).toMatch(/ned/i)
+
+      // try to login
+      return request(app)
+        .post(`${baseURL}/login`)
+        .send({ username: 'not_a_user', password: testUser.password })
+        .then(res => {
+          expect(res.status).toBe(400)
+          expect(res.body.errors.length).toBe(1)
+          expect(res.body.errors[0]).toMatch(/invalid credentials./i)
+        })
+    })
 
     test('Should return error if username is missing', async () => {
       return request(app)
@@ -95,6 +133,10 @@ describe('Tests for onboarding process', () => {
         .send({ password: testUser.password })
         .then(res => {
           expect(res.status).toBe(422)
+          expect(res.body.errors.length).toBe(1)
+          expect(res.body.errors[0]).toMatch(
+            /username and password are required to log in./i
+          )
         })
     })
 
@@ -104,6 +146,10 @@ describe('Tests for onboarding process', () => {
         .send({ username: testUser.username })
         .then(res => {
           expect(res.status).toBe(422)
+          expect(res.body.errors.length).toBe(1)
+          expect(res.body.errors[0]).toMatch(
+            /username and password are required to log in./i
+          )
         })
     })
   })
