@@ -76,7 +76,35 @@ Example Response:
 
 Possible Errors:
 
-TODO
+Missing username, password , or email in req.body
+
+```
+{
+    "errors": [
+        "A username, password, and email are required to register."
+    ]
+}
+```
+
+Invalid characters in username
+
+```
+{
+    "errors": [
+        "Username may only contain letters, numbers, and underscores"
+    ]
+}
+```
+
+Invalid email address
+
+```
+{
+"errors": [
+"Please provide a valid email address"
+]
+}
+```
 
 ---
 
@@ -98,36 +126,40 @@ Example Request:
 req.body
 
 ```
+
 {
-    username: "salty_Dud3",
-    password: "n4J3%Lp",
+username: "salty_Dud3",
+password: "n4J3%Lp",
 }
+
 ```
 
 Example Response:
 
 ```
+
 {
-    username: "salty_Dud3",
-    id: 1,
-    favorites: [
-      {
-      "id": 5493,
-      "commenter_name": "Mr.Salty",
-      "comment": " I hate puppies",
-      "rating": 56.4345,
-      "commenter_id": 402830
-    },
-    {
-      "id": 2770,
-      "commenter_name": "Mr.Salty",
-      "comment": "Everybody on this forum sucks",
-      "rating": 12.71,
-      "commenter_id": 402830
-    }
-    ],
-    token: "fjbifjlbia4335.4534vsla32w.fwlfj4sfsarasafd8",
+username: "salty_Dud3",
+id: 1,
+favorites: [
+{
+"id": 5493,
+"commenter_name": "Mr.Salty",
+"comment": " I hate puppies",
+"rating": 56.4345,
+"commenter_id": 402830
+},
+{
+"id": 2770,
+"commenter_name": "Mr.Salty",
+"comment": "Everybody on this forum sucks",
+"rating": 12.71,
+"commenter_id": 402830
 }
+],
+token: "fjbifjlbia4335.4534vsla32w.fwlfj4sfsarasafd8",
+}
+
 ```
 
 Possible Errors:
@@ -135,21 +167,29 @@ Possible Errors:
 Invalid Username and/or Password
 
 ```
+
 {
-    "errors": [
-        "Invalid Credentials"
-    ]
+"errors": [
+"Invalid Credentials."
+]
 }
+
 ```
 
 No Username and/or Password in req.body
 
 ```
+
 {
-    "errors": [
-        "Username and Password are required to log in."
-    ]
+"errors": [
+"Username and Password are required to log in."
+]
 }
+
 ```
 
 ---
+
+```
+
+```
