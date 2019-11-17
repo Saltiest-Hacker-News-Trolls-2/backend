@@ -11,7 +11,7 @@ It connects to a Postgres database hosted on Heroku.
 The base URL is:
 
 ```
-TODO
+ https://only-salty-hackers.herokuapp.com/
 ```
 
 ## Getting Started (Local)
@@ -91,17 +91,17 @@ Invalid characters in username
 ```
 {
     "errors": [
-        "Username may only contain letters, numbers, and underscores"
+        "Username may only contain letters, numbers, and underscores."
     ]
 }
 ```
 
-Invalid email address
+Invalid email address format
 
 ```
 {
 "errors": [
-"Please provide a valid email address"
+"Please provide a valid email address."
 ]
 }
 ```
