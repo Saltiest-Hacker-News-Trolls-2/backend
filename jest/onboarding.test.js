@@ -8,6 +8,7 @@ const testUser = {
   email: 'ned@mail.ned',
   password: 'abc?123'
 }
+const hashed = '$2a$12$QAKFHsSTGOSLASd7mUhiCeQFcUTxD4ObQnfomm0g32oXsN8gBOqpi'
 
 describe('Tests for onboarding process', () => {
   test.todo('verify db connection')
@@ -64,8 +65,30 @@ describe('Tests for onboarding process', () => {
           expect(res.status).not.toBe(404)
         })
     })
-    test.todo('should return token if password is correct')
+
+    test('should return token if password is correct', async () => {
+      // add user to db
+      await db('users').insert({ ...testUser, password: hashed })
+      // check that user was added to db
+      let isInDB = await db('users')
+        .where('username', testUser.username)
+        .first()
+      expect(isInDB.username).toMatch(/ned/i)
+      // try to login
+      const loginResult = await request(app)
+        .post(`${baseURL}/login`)
+        .send({ password: testUser.password, username: testUser.username })
+
+      //assert response
+      expect(loginResult.status).toBe(200)
+      expect(loginResult.body.username).toMatch(/ned/i)
+      expect(loginResult.body.id).toBeDefined()
+      expect(loginResult.body.favorites).toBeDefined()
+      expect(loginResult.body.token).toBeDefined()
+    })
+
     test.todo('should return errror if password is incorrect')
+
     test('Should return error if username is missing', async () => {
       return request(app)
         .post(`${baseURL}/login`)

@@ -14,5 +14,6 @@ function validateLogin() {
     body('password')
       .exists()
       .withMessage('Username and Password are required to login.')
+    // search for user and compare password
   ]
 }
