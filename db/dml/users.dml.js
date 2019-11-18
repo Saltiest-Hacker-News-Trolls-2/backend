@@ -1,8 +1,7 @@
 const kx = require('../db_interface')
 
 module.exports = {
-  register,
-  validateUser
+  register
 }
 
 function register(user) {
@@ -14,10 +13,4 @@ function register(user) {
         .select(['id', 'username'])
         .first()
     })
-}
-
-function validateUser(username) {
-  return kx('users')
-    .where('username', username)
-    .select('password')
 }
