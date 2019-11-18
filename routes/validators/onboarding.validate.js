@@ -18,11 +18,15 @@ function validateRegister() {
       .matches(/[\W]/)
       .withMessage(
         'Username may only contain letters, numbers, and underscores.'
-      ),
+      )
+      .isLength({ min: 2 })
+      .withMessage('Username must be at least two characters.'),
     body('password')
       .exists()
       .withMessage(missing)
-      .bail(),
+      .bail()
+      .isLength({ min: 6 })
+      .withMessage('Password must be at least six characters.'),
     body('email')
       .exists()
       .withMessage(missing)

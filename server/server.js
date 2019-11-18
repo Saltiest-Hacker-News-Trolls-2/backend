@@ -5,6 +5,7 @@ const cors = require('cors')
 const morgan = require('morgan')
 
 const { available_routes } = require('./helpMessage')
+const { restrictJWT } = require('../middleware')
 
 const server = express()
 

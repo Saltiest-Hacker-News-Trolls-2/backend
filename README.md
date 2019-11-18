@@ -33,9 +33,9 @@ Quick Links: [Users Overview](#users-overview) | [Comments Overview](#comments-o
 | ------ | ----------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
 | POST   | `/api/register/`  | `email address`- req.body, `username`- req.body, `password`- req.body | Used for adding a new user to the database. Returns an object containing user data and a JWT token. |
 | POST   | `/api/login/`     | `username` - req.body, `password`- req.body                           | Used to log a user in. Returns an object containing user data and a JWT token.                      |
-| GET    | `/api/users/:id/` | Successful Login                                                      | Used to show details of a specific user.                                                            |
-| PUT    | `/api/users/:id/` | Successful Login                                                      | Used to update the information of the user currently logged in.                                     |
-| DELETE | `/api/users/:id/` | Successful Login                                                      | Used to delete the user that is currently logged in.                                                |
+| GET    | `/api/users/:id/` | Authentication Token                                                  | Used to show details of a specific user.                                                            |
+| PUT    | `/api/users/:id/` | Authentication Token                                                  | Used to update the information of the user currently logged in.                                     |
+| DELETE | `/api/users/:id/` | Authentication Token                                                  | Used to delete the user that is currently logged in.                                                |
 
 ---
 
@@ -96,12 +96,32 @@ Invalid characters in username
 }
 ```
 
+Username taken.
+
+```
+{
+    "errors": [
+        "Sorry, that username is unavailable."
+    ]
+}
+```
+
 Invalid email address format
 
 ```
 {
 "errors": [
 "Please provide a valid email address."
+]
+}
+```
+
+Email taken
+
+```
+{
+"errors": [
+"An account has already been registered with that email address."
 ]
 }
 ```
