@@ -19,7 +19,9 @@ router.post(
   async (req, res, next) => {
     try {
       const user = req.body
-      //check if user exists
+
+      // convert username to lowercase
+      user.username = user.username.toLowerCase()
 
       // hash password
       const hashed = bcrypt.hashSync(user.password, 12)
@@ -33,7 +35,22 @@ router.post(
       // return user and token
       res.status(201).json({ ...newUser, favorites: [], token })
     } catch (err) {
-      next(err)
+      if (err.constraint) {
+        const constraint = err.constraint
+        if (/username_unique/i.test(constraint)) {
+          res
+            .status(400)
+            .json({ errors: ['Sorry, that username is unavailable.'] })
+        } else if (/email_unique/i.test(constraint)) {
+          res.status(400).json({
+            errors: [
+              'An account has already been registered with that email address.'
+            ]
+          })
+        }
+      } else {
+        next(err)
+      }
     }
   }
 )
@@ -62,7 +79,7 @@ router.post(
         return
       }
       // return error if username or password is incorrect
-      next({ type: 'INVALIDCRED' })
+      res.status(400).json({ errors: ['Invalid Credentials.'] })
     } catch (err) {
       console.log({ err })
       next({ ...err })

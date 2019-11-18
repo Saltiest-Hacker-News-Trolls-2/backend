@@ -41,7 +41,7 @@ describe('Tests for onboarding process', () => {
         .send(testUser)
       // assert correct response
       expect(res.status).toBe(201)
-      expect(res.body.username).toBe(testUser.username)
+      expect(res.body.username).toBeDefined()
       expect(res.body.id).toBeDefined()
       expect(res.body.token).toBeDefined()
       // assert database was updated
@@ -94,7 +94,7 @@ describe('Tests for onboarding process', () => {
     test('Should return error if email is not a valid format', () => {
       return request(app)
         .post(`${baseURL}/register`)
-        .send({ username: 'joe', password: 'abc?123', email: 'bbb' })
+        .send({ ...testUser, email: 'bbb' })
         .then(res => {
           expect(res.status).toBe(422)
           expect(res.body.errors[0]).toMatch(
@@ -103,14 +103,30 @@ describe('Tests for onboarding process', () => {
         })
     })
 
+    test('Should store usernames in lowercase', async () => {
+      //db should be empty
+      db('users').then(res => expect(res.length).toBe(0))
+
+      // register new user
+      const res = await request(app)
+        .post(`${baseURL}/register`)
+        .send(testUser)
+
+      // assert correct response
+      expect(res.status).toBe(201)
+      expect(res.body.username).toBe('ned')
+    })
+
     test('Should not allow duplicate usernames', async () => {
       //db should be empty
       db('users').then(res => expect(res.length).toBe(0))
 
       // add user to db
-      db('users')
-        .insert(testUser)
-        .then(res => expect(res.length).toBe(1))
+      const id = await db('users').insert({ ...testUser, username: 'ned' })
+      const user = await db('users').first()
+
+      expect(user.username).toBe('ned')
+
       // try to add user again
       const res = await request(app)
         .post(`${baseURL}/register`)
@@ -122,9 +138,26 @@ describe('Tests for onboarding process', () => {
       )
     })
 
+    test('Should not allow duplicate emails', async () => {
+      //db should be empty
+      db('users').then(res => expect(res.length).toBe(0))
+
+      // add user to db
+      db('users')
+        .insert(testUser)
+        .then(res => expect(res.length).toBe(1))
+      // try to add user again
+      const res = await request(app)
+        .post(`${baseURL}/register`)
+        .send({ ...testUser, username: 'julie' })
+      // assert correct response
+      expect(res.status).toBe(400)
+      expect(res.body.errors[0]).toMatch(
+        /an account has already been registered with that email address./i
+      )
+    })
+
     test.todo('validate param format')
-    test.todo('should not allow duplicate usernames')
-    test.todo('should not allow duplicate emails')
   }) // end test for register
 
   describe('Tests for /login', () => {
