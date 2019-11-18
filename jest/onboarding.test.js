@@ -3,15 +3,14 @@ const request = require('supertest')
 const db = require('../db/db_interface')
 
 const baseURL = '/api'
-const testUser = {
-  username: 'Ned',
-  email: 'ned@mail.com',
-  password: 'abc?123'
-}
-const hashed = '$2a$12$QAKFHsSTGOSLASd7mUhiCeQFcUTxD4ObQnfomm0g32oXsN8gBOqpi'
+const { testUser, hashed } = require('./mock_data/user')
 
 describe('Tests for onboarding process', () => {
-  test.todo('verify db connection')
+  test('Verify dabase connection', () => {
+    db('users').then(res => {
+      expect(res.length).toBeDefined()
+    })
+  })
 
   test('Environment should be "test"', () => {
     expect(process.env.NODE_ENV).toBe('test')
@@ -117,12 +116,28 @@ describe('Tests for onboarding process', () => {
       expect(res.body.username).toBe('ned')
     })
 
+    test('Usernames must be at least two characters', async () => {
+      //db should be empty
+      db('users').then(res => expect(res.length).toBe(0))
+
+      // register new user
+      const res = await request(app)
+        .post(`${baseURL}/register`)
+        .send({ ...testUser, username: 'b' })
+
+      // assert correct response
+      expect(res.status).toBe(422)
+      expect(res.body.errors[0]).toMatch(
+        /username must be at least two characters/i
+      )
+    })
+
     test('Should not allow duplicate usernames', async () => {
       //db should be empty
       db('users').then(res => expect(res.length).toBe(0))
 
       // add user to db
-      const id = await db('users').insert({ ...testUser, username: 'ned' })
+      await db('users').insert({ ...testUser, username: 'ned' })
       const user = await db('users').first()
 
       expect(user.username).toBe('ned')
@@ -154,6 +169,22 @@ describe('Tests for onboarding process', () => {
       expect(res.status).toBe(400)
       expect(res.body.errors[0]).toMatch(
         /an account has already been registered with that email address./i
+      )
+    })
+
+    test('Password must  be at least six characters', async () => {
+      //db should be empty
+      db('users').then(res => expect(res.length).toBe(0))
+
+      // register new user
+      const res = await request(app)
+        .post(`${baseURL}/register`)
+        .send({ ...testUser, password: 'z' })
+
+      // assert correct response
+      expect(res.status).toBe(422)
+      expect(res.body.errors[0]).toMatch(
+        /password must be at least six characters/i
       )
     })
 

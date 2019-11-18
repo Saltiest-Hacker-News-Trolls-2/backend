@@ -6,14 +6,16 @@
       "id": 5493,
       "commenter_name": "Mr.Salty",
       "comment": " I hate puppies",
-      "rating": 56.4345,
+      "commenter_rating": 56.4345,
+      "comment_score": 12,
       "commenter_id": 402830
     },
     {
       "id": 2770,
       "commenter_name": "Mr.Salty",
       "comment": "Everybody on this forum sucks",
-      "rating": 12.71,
+      "comment_score": 12,
+      "commenter_rating": 12.71,
       "commenter_id": 402830
     }
   ]
