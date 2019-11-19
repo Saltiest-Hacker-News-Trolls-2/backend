@@ -61,9 +61,10 @@ router.post(
       // validate password
       if (dbResult && bcrypt.compareSync(user.password, dbResult.password)) {
         // get user's favorites
-        const favorites = []
+        let favorites = await kxu.getFavorites(dbResult.id)
+        favorites = favorites.map(fav => fav.id)
         // generate token
-        const token = generateJWT({ dbResult })
+        const token = generateJWT(dbResult)
         // return token
         res
           .status(200)
