@@ -1,6 +1,9 @@
 exports.up = function(knex) {
   return knex.schema.createTable('comments', tbl => {
-    tbl.increments()
+    tbl
+      .integer('id')
+      .unique()
+      .notNullable()
   })
 }
 
