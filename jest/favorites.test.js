@@ -35,6 +35,27 @@ describe('Tests for /user/:id/favorites', () => {
       .then(res => expect(res.status).not.toBe(404))
   })
 
+  test('Should throw error message if a comment is not provided for POST', async () => {
+    return request(app)
+      .post(`${baseURL}/favorites`)
+      .set('authorization', token)
+      .then(res => {
+        expect(res.status).toBe(422)
+        expect(res.body.errors.comment).toMatch(/a comment id is required./i)
+      })
+  })
+
+  test('Should throw error message comment is not an integer for POST', async () => {
+    return request(app)
+      .post(`${baseURL}/favorites`)
+      .set('authorization', token)
+      .send({ comment: 'abc' })
+      .then(res => {
+        expect(res.status).toBe(422)
+        expect(res.body.errors.comment).toMatch(/comment must be an integer./i)
+      })
+  })
+
   test('Should be able to add a favorite', async () => {
     return request(app)
       .post(`${baseURL}/favorites`)
@@ -42,12 +63,67 @@ describe('Tests for /user/:id/favorites', () => {
       .send({ comment: 5 })
       .then(res => {
         expect(res.status).toBe(201)
-        expect(res.body.comment).toBe(5)
+        expect(res.body.comment).toBe('5')
       })
   })
+
   test('DELETE route should exist for favorites', async () => {
     return request(app)
       .delete(`${baseURL}/favorites`)
       .then(res => expect(res.status).not.toBe(404))
+  })
+
+  test('Should be able to delete a favorite', async () => {
+    const res = await request(app)
+      .delete(`${baseURL}/favorites`)
+      .set('authorization', token)
+      .send({ comment: 4 })
+
+    expect(res.status).toBe(200)
+    expect(res.body.comment).toBe('4')
+
+    return db('user_favorites')
+      .where({ user_id: 1, comment_id: 4 })
+      .then(data => {
+        expect(data.length).toBe(0)
+      })
+  })
+
+  test('Should throw error message if a comment is not provided for DELETE', async () => {
+    return request(app)
+      .delete(`${baseURL}/favorites`)
+      .set('authorization', token)
+      .then(res => {
+        expect(res.status).toBe(422)
+        expect(res.body.errors.comment).toMatch(/a comment id is required./i)
+      })
+  })
+
+  test('Should throw error message comment is not an integer for DELETE', async () => {
+    return request(app)
+      .delete(`${baseURL}/favorites`)
+      .set('authorization', token)
+      .send({ comment: 'abc' })
+      .then(res => {
+        expect(res.status).toBe(422)
+        expect(res.body.errors.comment).toMatch(/comment must be an integer./i)
+      })
+  })
+
+  test('GET route should exist for favorites', async () => {
+    return request(app)
+      .get(`${baseURL}/favorites`)
+      .then(res => expect(res.status).not.toBe(404))
+  })
+
+  test("Should return list of user's favorites", async () => {
+    return request(app)
+      .get(`${baseURL}/favorites`)
+      .set('authorization', token)
+      .then(res => {
+        expect(res.status).toBe(200)
+        expect(res.body.favorites).toBeDefined()
+        expect(res.body.favorites.length).toBe(4)
+      })
   })
 })

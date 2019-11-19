@@ -19,12 +19,14 @@ The base URL is:
 - run `npm i && npm i -D` in order to install all dependencies
 - create two databases on your local device 'saltiest' and 'saltiest-test'
 - `createdb saltiest && createdb saltiest-test`
+- create database tables with `[npx] knex migrate:latest --env=development && [npx] knex migrate:latest --env=test`
+- seed database with `[npx] knex seed:run --env=development && [npx] knex seed:run --env=test`
 - use the command `npm run dev` to run the server locally using the 'development' environment settings
 - use the command `npm run test` to run the test files using the 'test' environment settings
 
 ## Endpoints
 
-Quick Links: [Onboarding Overview](#onboarding-overview) | [Users Overview](#users-overview)
+Quick Links: [Onboarding Overview](#onboarding-overview) | [Users Overview](#users-overview) | [Favorites Overview](#favorites-overview)
 
 ### Onboarding Overview
 
@@ -199,12 +201,10 @@ password: "A password is required to log in.",
 
 ### Users Overview
 
-| Method | Endpoint                   | Requires                                 | Description                                              |
-| ------ | -------------------------- | ---------------------------------------- | -------------------------------------------------------- |
-| GET    | `/api/users/:id/`          | Authentication Token                     | Returns user data.                                       |
-| DELETE | `/api/users/:id/`          | Authentication Token                     | Used to delete the user that is currently logged in.     |
-| DELETE | `/api/users/:id/favorites` | Authentication Token, comment - req.body | Used to delete a comment from the list of user favorites |
-| POST   | `/api/users/:id/favorites` | Authentication Token, comment - req.body | Used to add a comment to the user's favorites.           |
+| Method | Endpoint         | Requires             | Description                                          |
+| ------ | ---------------- | -------------------- | ---------------------------------------------------- |
+| GET    | `/api/users/:id` | Authentication Token | Returns user data.                                   |
+| DELETE | `/api/users/:id` | Authentication Token | Used to delete the user that is currently logged in. |
 
 ---
 
@@ -229,6 +229,118 @@ Example Response:
 id: 1,
 favorites: [
 342,673, 122, 560
+],
+}
+
+```
+
+Possible Errors:
+
+Invalid Token
+
+```
+
+{
+"errors": [
+"invalid token"
+]
+}
+
+```
+
+Not Authorized
+
+```
+
+{
+"errors": [
+"Not Authorized"
+]
+}
+
+```
+
+### Delete User
+
+Method used: **[DELETE]** `/api/users/:id`
+
+On Success: Returns a message.
+
+Parameters:
+
+| Parameter Name | Location                  | Type   | Required |
+| -------------- | ------------------------- | ------ | -------- |
+| Auth Token     | req.headers.authorization | string | yes      |
+
+Example Response:
+
+```
+
+{
+  message: "User account successfully deleted."
+}
+
+```
+
+Possible Errors:
+
+Invalid Token
+
+```
+
+{
+"errors": [
+"invalid token"
+]
+}
+
+```
+
+Not Authorized
+
+```
+
+{
+"errors": [
+"Not Authorized"
+]
+}
+
+```
+
+---
+
+---
+
+### Favorites Overview
+
+| Method | Endpoint                   | Requires                                 | Description                                              |
+| ------ | -------------------------- | ---------------------------------------- | -------------------------------------------------------- |
+| GET    | `/api/users/:id/favorites` | Authentication Token                     | Returns user's favorite comments.                        |
+| DELETE | `/api/users/:id/favorites` | Authentication Token, comment - req.body | Used to delete a comment from the list of user favorites |
+| POST   | `/api/users/:id/favorites` | Authentication Token, comment - req.body | Used to add a comment to the user's favorites.           |
+
+---
+
+### Get User Favorites
+
+Method used: **[GET]** `/api/users/:id/favorites`
+
+On Success: Returns an object containing the user's favorite comments.
+
+Parameters:
+
+| Parameter Name | Location                  | Type   | Required |
+| -------------- | ------------------------- | ------ | -------- |
+| Auth Token     | req.headers.authorization | string | yes      |
+
+Example Response:
+
+```
+
+{
+favorites: [
+  342,673, 122, 560
 ],
 }
 
@@ -306,6 +418,104 @@ Invalid Token
 "errors": [
 "invalid token"
 ]
+}
+
+```
+
+Comment ID was not provided
+
+```
+
+{
+"errors": {
+  comment : " A comment ID is required."
+}
+}
+
+```
+
+Comment ID is not an integer
+
+```
+
+{
+"errors": {
+  comment : "Comment must be an integer."
+}
+}
+
+```
+
+---
+
+### Delete Favorite
+
+Method used: **[DELETE]** `/api/users/:id/favorites`
+
+On Success: Returns an object containing the ID of the deleted comment.
+
+Parameters:
+
+| Parameter Name | Location | Type    | Required |
+| -------------- | -------- | ------- | -------- |
+| comment        | req.body | integer | yes      |
+
+Example Request:
+
+req.body
+
+```
+
+{
+comment: 5,
+}
+
+```
+
+Example Response:
+
+```
+
+{
+comment: 5,
+}
+
+```
+
+Possible Errors:
+
+Invalid Token
+
+```
+
+{
+errors: [
+"invalid token"
+]
+}
+
+```
+
+Comment ID was not provided
+
+```
+
+{
+"errors": {
+  comment : " A comment ID is required."
+}
+}
+
+```
+
+Comment ID is not an integer
+
+```
+
+{
+"errors": {
+  comment : "Comment must be an integer."
+}
 }
 
 ```
