@@ -1,6 +1,6 @@
 exports.seed = function(knex) {
   return knex('comments')
-    .delete()
+    .del()
     .then(function() {
       return knex('comments').insert([
         { id: 1 },

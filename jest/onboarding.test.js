@@ -19,7 +19,7 @@ describe('Tests for onboarding process', () => {
   describe('Tests for /register', () => {
     beforeEach(async () => {
       // clear database
-      await db('users').truncate()
+      await db('users').del()
     })
 
     test('/register route should exist', () => {
@@ -194,7 +194,7 @@ describe('Tests for onboarding process', () => {
   describe('Tests for /login', () => {
     beforeEach(async () => {
       // clear database
-      await db('users').truncate()
+      await db('users').del()
     })
 
     test('/login route should exist', () => {

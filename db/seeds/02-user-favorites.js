@@ -1,6 +1,6 @@
 exports.seed = function(knex) {
   return knex('user_favorites')
-    .delete()
+    .del()
     .then(function() {
       return knex('user_favorites').insert([
         { user_id: 1, comment_id: 1 },
