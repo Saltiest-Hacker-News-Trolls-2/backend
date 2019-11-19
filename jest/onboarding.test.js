@@ -52,7 +52,7 @@ describe('Tests for onboarding process', () => {
         .send({ password: 'abc?123', email: 'n@n.com' })
         .then(res => {
           expect(res.status).toBe(422)
-          expect(res.body.errors.length).toBe(1)
+          expect(res.body.errors.username).toBeDefined()
         })
     })
 
@@ -66,7 +66,7 @@ describe('Tests for onboarding process', () => {
         })
         .then(res => {
           expect(res.status).toBe(422)
-          expect(res.body.errors.length).toBe(1)
+          expect(res.body.errors.username).toBeDefined()
         })
     })
 
@@ -76,7 +76,7 @@ describe('Tests for onboarding process', () => {
         .send({ username: 'joe', email: 'n@n.com' })
         .then(res => {
           expect(res.status).toBe(422)
-          expect(res.body.errors.length).toBe(1)
+          expect(res.body.errors.password).toBeDefined()
         })
     })
 
@@ -86,7 +86,7 @@ describe('Tests for onboarding process', () => {
         .send({ username: 'joe', password: 'abc?123' })
         .then(res => {
           expect(res.status).toBe(422)
-          expect(res.body.errors.length).toBe(1)
+          expect(res.body.errors.email).toBeDefined()
         })
     })
 
@@ -96,7 +96,7 @@ describe('Tests for onboarding process', () => {
         .send({ ...testUser, email: 'bbb' })
         .then(res => {
           expect(res.status).toBe(422)
-          expect(res.body.errors[0]).toMatch(
+          expect(res.body.errors.email).toMatch(
             /please provide a valid email address/i
           )
         })
@@ -127,7 +127,7 @@ describe('Tests for onboarding process', () => {
 
       // assert correct response
       expect(res.status).toBe(422)
-      expect(res.body.errors[0]).toMatch(
+      expect(res.body.errors.username).toMatch(
         /username must be at least two characters/i
       )
     })
@@ -148,7 +148,7 @@ describe('Tests for onboarding process', () => {
         .send(testUser)
       // assert correct response
       expect(res.status).toBe(400)
-      expect(res.body.errors[0]).toMatch(
+      expect(res.body.errors.username).toMatch(
         /sorry, that username is unavailable./i
       )
     })
@@ -167,7 +167,7 @@ describe('Tests for onboarding process', () => {
         .send({ ...testUser, username: 'julie' })
       // assert correct response
       expect(res.status).toBe(400)
-      expect(res.body.errors[0]).toMatch(
+      expect(res.body.errors.email).toMatch(
         /an account has already been registered with that email address./i
       )
     })
@@ -183,7 +183,7 @@ describe('Tests for onboarding process', () => {
 
       // assert correct response
       expect(res.status).toBe(422)
-      expect(res.body.errors[0]).toMatch(
+      expect(res.body.errors.password).toMatch(
         /password must be at least six characters/i
       )
     })
@@ -242,8 +242,7 @@ describe('Tests for onboarding process', () => {
         .send({ username: testUser.username, password: 'dog' })
         .then(res => {
           expect(res.status).toBe(400)
-          expect(res.body.errors.length).toBe(1)
-          expect(res.body.errors[0]).toMatch(/invalid credentials./i)
+          expect(res.body.errors.password).toMatch(/invalid credentials./i)
         })
     })
 
@@ -262,8 +261,7 @@ describe('Tests for onboarding process', () => {
         .send({ username: 'not_a_user', password: testUser.password })
         .then(res => {
           expect(res.status).toBe(400)
-          expect(res.body.errors.length).toBe(1)
-          expect(res.body.errors[0]).toMatch(/invalid credentials./i)
+          expect(res.body.errors.username).toMatch(/invalid credentials./i)
         })
     })
 
@@ -273,9 +271,8 @@ describe('Tests for onboarding process', () => {
         .send({ password: testUser.password })
         .then(res => {
           expect(res.status).toBe(422)
-          expect(res.body.errors.length).toBe(1)
-          expect(res.body.errors[0]).toMatch(
-            /username and password are required to log in./i
+          expect(res.body.errors.username).toMatch(
+            /a username is required to log in./i
           )
         })
     })
@@ -286,9 +283,8 @@ describe('Tests for onboarding process', () => {
         .send({ username: testUser.username })
         .then(res => {
           expect(res.status).toBe(422)
-          expect(res.body.errors.length).toBe(1)
-          expect(res.body.errors[0]).toMatch(
-            /username and password are required to log in./i
+          expect(res.body.errors.password).toMatch(
+            /a password is required to log in./i
           )
         })
     })
