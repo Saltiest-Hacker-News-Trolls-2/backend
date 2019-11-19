@@ -22,9 +22,9 @@ describe('Tests for /user', () => {
     expect(process.env.NODE_ENV).toBe('test')
   })
 
-  test('Verify dabase connection', () => {
+  test.only('Verify dabase connection', () => {
     db('users').then(res => {
-      expect(res.length).toBeDefined()
+      expect(res.length).toBe(0)
     })
   })
 
@@ -59,7 +59,7 @@ describe('Tests for /user', () => {
     // add user to db
     await db('users').insert(testUser)
     let user = await db('users')
-      .where({ username: 'Ned' })
+      .where({ username: 'ned' })
       .first()
     expect(user.id).toBe(1)
 
@@ -78,5 +78,7 @@ describe('Tests for /user', () => {
     expect(user).toBe(undefined)
   })
 
-  test.todo('get user data')
+  test("Should be able to get user's favorite comments ", async () => {
+    // try to get user's favorites
+  })
 })
