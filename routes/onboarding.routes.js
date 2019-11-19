@@ -25,6 +25,7 @@ router.post(
   async (req, res, next) => {
     try {
       const user = req.body
+
       // hash password
       const hashed = bcrypt.hashSync(user.password, 12)
       // replace req password with hashed version
@@ -48,21 +49,25 @@ router.post(
   handleValidationErr,
   async (req, res, next) => {
     try {
-      const { username, password } = req.body
+      const user = req.body
+      user.username = user.username.toLowerCase()
       // get user from db
-      const dbResult = await kxa.getOneBy({ username }, 'users', [
-        'password',
-        'id'
-      ])
+      const dbResult = await kxa.getOneBy(
+        { username: user.username },
+        'users',
+        ['password', 'id']
+      )
 
       // validate password
-      if (dbResult && bcrypt.compareSync(password, dbResult.password)) {
+      if (dbResult && bcrypt.compareSync(user.password, dbResult.password)) {
         // get user's favorites
         const favorites = []
         // generate token
         const token = generateJWT({ dbResult })
         // return token
-        res.status(200).json({ username, favorites, id: dbResult.id, token })
+        res
+          .status(200)
+          .json({ username: user.username, favorites, id: dbResult.id, token })
         return
       }
       // return error if username or password is incorrect
