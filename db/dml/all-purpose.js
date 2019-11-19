@@ -5,8 +5,7 @@ module.exports = {
   getAllBy,
   add,
   update,
-  remove,
-  findChildren
+  remove
 }
 
 function getOneBy(filter, table, fields = '*') {
@@ -37,12 +36,4 @@ function remove(id, table) {
   return kx(table)
     .where('id', id)
     .del()
-}
-
-function findChildren(id) {
-  return kx('steps')
-    .join('schemes', 'schemes.id', 'steps.scheme_id')
-    .select('schemes.scheme_name', 'steps.instructions', 'steps.step_number')
-    .where('scheme_id', id)
-    .orderBy('steps.step_number')
 }

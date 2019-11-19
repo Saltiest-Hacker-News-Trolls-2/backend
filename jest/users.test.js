@@ -11,7 +11,11 @@ const { testUser, hashed } = require('./mock_data/user')
 describe('Tests for /user', () => {
   beforeEach(async () => {
     // clear database
-    await db('users').truncate()
+    await db('users').del()
+    await db('comments').del()
+    await db('user_favorites').del()
+    // reset auto-generated id's
+    await db.raw('TRUNCATE TABLE users RESTART IDENTITY CASCADE')
   })
 
   test('Environment should be "test"', () => {
@@ -50,12 +54,14 @@ describe('Tests for /user', () => {
 
   test('Should be able to delete a user from the db', async () => {
     // db should be empty
-    let users = await db('users')
+    const users = await db('users')
     expect(users.length).toBe(0)
     // add user to db
     await db('users').insert(testUser)
-    users = await db('users')
-    expect(users.length).toBe(1)
+    let user = await db('users')
+      .where({ username: 'Ned' })
+      .first()
+    expect(user.id).toBe(1)
 
     // remove user using from db
     const result = await request(app)
@@ -66,12 +72,11 @@ describe('Tests for /user', () => {
     expect(result.status).toBe(200)
     expect(result.body.message).toMatch(/user account successfully deleted/i)
     // user removed from db
-    users = await db('users')
-    expect(users.length).toBe(0)
+    user = await db('users')
+      .where('username', 'Ned')
+      .first()
+    expect(user).toBe(undefined)
   })
 
   test.todo('get user data')
-  test.todo('should not be able to access user data without token')
-  test.todo('should only be allowed to access userdata with correct id')
-  test.todo('verify db connection')
 })
