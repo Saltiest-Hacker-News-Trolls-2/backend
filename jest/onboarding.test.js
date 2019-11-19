@@ -1,27 +1,33 @@
 const app = require('../server/server')
 const request = require('supertest')
 const db = require('../db/db_interface')
+const clearAndSeed = require('./utils/clearAndSeed')
 
 const baseURL = '/api'
-const { testUser, hashed } = require('./mock_data/user')
+const { testUser, hashed, joe } = require('./mock_data/user')
 
-describe('Tests for onboarding process', () => {
-  test('Verify dabase connection', () => {
-    db('users').then(res => {
-      expect(res.length).toBeDefined()
-    })
+describe.skip('Tests for onboarding process', () => {
+  beforeEach(async () => {
+    await clearAndSeed(db)
   })
 
   test('Environment should be "test"', () => {
     expect(process.env.NODE_ENV).toBe('test')
   })
 
-  describe('Tests for /register', () => {
-    beforeEach(async () => {
-      // clear database
-      await db('users').del()
-    })
+  test('Verify dabase connection', async () => {
+    const users = await db('users')
+    expect(users.length).toBe(1)
+    expect(users[0].username).toBe('ned')
 
+    const comments = await db('comments')
+    expect(comments.length).toBe(4)
+
+    const favorites = await db('user_favorites')
+    expect(favorites.length).toBe(4)
+  })
+
+  describe('Tests for /register', () => {
     test('/register route should exist', () => {
       return request(app)
         .post(`${baseURL}/register`)
@@ -32,12 +38,9 @@ describe('Tests for onboarding process', () => {
     })
 
     test('Should be able to register new user', async () => {
-      //db should be empty
-      db('users').then(res => expect(res.length).toBe(0))
-      // make registration request
       const res = await request(app)
         .post(`${baseURL}/register`)
-        .send(testUser)
+        .send(joe)
       // assert correct response
       expect(res.status).toBe(201)
       expect(res.body.username).toBeDefined()
@@ -93,7 +96,7 @@ describe('Tests for onboarding process', () => {
     test('Should return error if email is not a valid format', () => {
       return request(app)
         .post(`${baseURL}/register`)
-        .send({ ...testUser, email: 'bbb' })
+        .send({ ...joe, email: 'bbb' })
         .then(res => {
           expect(res.status).toBe(422)
           expect(res.body.errors.email).toMatch(
@@ -103,27 +106,21 @@ describe('Tests for onboarding process', () => {
     })
 
     test('Should store usernames in lowercase', async () => {
-      //db should be empty
-      db('users').then(res => expect(res.length).toBe(0))
-
       // register new user
       const res = await request(app)
         .post(`${baseURL}/register`)
-        .send(testUser)
+        .send({ ...joe, username: 'JOE' })
 
       // assert correct response
       expect(res.status).toBe(201)
-      expect(res.body.username).toBe('ned')
+      expect(res.body.username).toBe('joe')
     })
 
     test('Usernames must be at least two characters', async () => {
-      //db should be empty
-      db('users').then(res => expect(res.length).toBe(0))
-
       // register new user
       const res = await request(app)
         .post(`${baseURL}/register`)
-        .send({ ...testUser, username: 'b' })
+        .send({ ...joe, username: 'b' })
 
       // assert correct response
       expect(res.status).toBe(422)
@@ -133,16 +130,7 @@ describe('Tests for onboarding process', () => {
     })
 
     test('Should not allow duplicate usernames', async () => {
-      //db should be empty
-      db('users').then(res => expect(res.length).toBe(0))
-
-      // add user to db
-      await db('users').insert({ ...testUser, username: 'ned' })
-      const user = await db('users').first()
-
-      expect(user.username).toBe('ned')
-
-      // try to add user again
+      // try to add invalid user
       const res = await request(app)
         .post(`${baseURL}/register`)
         .send(testUser)
@@ -187,16 +175,9 @@ describe('Tests for onboarding process', () => {
         /password must be at least six characters/i
       )
     })
-
-    test.todo('validate param format')
   }) // end test for register
 
   describe('Tests for /login', () => {
-    beforeEach(async () => {
-      // clear database
-      await db('users').del()
-    })
-
     test('/login route should exist', () => {
       return request(app)
         .post(`${baseURL}/login`)
@@ -207,14 +188,6 @@ describe('Tests for onboarding process', () => {
     })
 
     test('should return token if password is correct', async () => {
-      // add user to db
-      await db('users').insert({ ...testUser, password: hashed })
-      // check that user was added to db
-      let isInDB = await db('users')
-        .where('username', testUser.username)
-        .first()
-      expect(isInDB.username).toMatch(/ned/i)
-      // try to login
       const loginResult = await request(app)
         .post(`${baseURL}/login`)
         .send({ password: testUser.password, username: testUser.username })
@@ -223,19 +196,11 @@ describe('Tests for onboarding process', () => {
       expect(loginResult.status).toBe(200)
       expect(loginResult.body.username).toMatch(/ned/i)
       expect(loginResult.body.id).toBeDefined()
-      expect(loginResult.body.favorites).toBeDefined()
+      expect(loginResult.body.favorites.length).toBe(4)
       expect(loginResult.body.token).toBeDefined()
     })
 
     test('Should return error if password is incorrect', async () => {
-      // add user to db
-      await db('users').insert({ ...testUser, password: hashed })
-      // check that user was added to db
-      let isInDB = await db('users')
-        .where('username', testUser.username)
-        .first()
-      expect(isInDB.username).toMatch(/ned/i)
-
       // try to login
       return request(app)
         .post(`${baseURL}/login`)
@@ -247,14 +212,6 @@ describe('Tests for onboarding process', () => {
     })
 
     test('Should return error if username is incorrect', async () => {
-      // add user to db
-      await db('users').insert({ ...testUser, password: hashed })
-      // check that user was added to db
-      let isInDB = await db('users')
-        .where('username', testUser.username)
-        .first()
-      expect(isInDB.username).toMatch(/ned/i)
-
       // try to login
       return request(app)
         .post(`${baseURL}/login`)
