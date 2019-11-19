@@ -24,18 +24,14 @@ The base URL is:
 
 ## Endpoints
 
-Quick Links: [Users Overview](#users-overview) | [Comments Overview](#comments-overview) |
-[Wakeup Overview](#wakeup-overview)
+Quick Links: [Onboarding Overview](#onboarding-overview) | [Users Overview](#users-overview)
 
-### Users Overview
+### Onboarding Overview
 
-| Method | Endpoint          | Requires                                                              | Description                                                                                         |
-| ------ | ----------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| POST   | `/api/register/`  | `email address`- req.body, `username`- req.body, `password`- req.body | Used for adding a new user to the database. Returns an object containing user data and a JWT token. |
-| POST   | `/api/login/`     | `username` - req.body, `password`- req.body                           | Used to log a user in. Returns an object containing user data and a JWT token.                      |
-| GET    | `/api/users/:id/` | Authentication Token                                                  | Used to show details of a specific user.                                                            |
-| PUT    | `/api/users/:id/` | Authentication Token                                                  | Used to update the information of the user currently logged in.                                     |
-| DELETE | `/api/users/:id/` | Authentication Token                                                  | Used to delete the user that is currently logged in.                                                |
+| Method | Endpoint         | Requires                                                              | Description                                                                                         |
+| ------ | ---------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| POST   | `/api/register/` | `email address`- req.body, `username`- req.body, `password`- req.body | Used for adding a new user to the database. Returns an object containing user data and a JWT token. |
+| POST   | `/api/login/`    | `username` - req.body, `password`- req.body                           | Used to log a user in. Returns an object containing user data and a JWT token.                      |
 
 ---
 
@@ -80,9 +76,11 @@ Missing username, password , or email in req.body
 
 ```
 {
-    "errors": [
-        "A username, password, and email are required to register."
-    ]
+    "errors": {
+       username: "A username is required to register.",
+       email: "An email is required to register.",
+       password: "A password is required to register.",
+    }
 }
 ```
 
@@ -90,9 +88,9 @@ Invalid characters in username
 
 ```
 {
-    "errors": [
-        "Username may only contain letters, numbers, and underscores."
-    ]
+    "errors": {
+       username: "Username may only contain letters, numbers, and underscores."
+    }
 }
 ```
 
@@ -100,9 +98,9 @@ Username taken.
 
 ```
 {
-    "errors": [
-        "Sorry, that username is unavailable."
-    ]
+    "errors": {
+        username:"Sorry, that username is unavailable."
+    }
 }
 ```
 
@@ -110,9 +108,9 @@ Invalid email address format
 
 ```
 {
-"errors": [
-"Please provide a valid email address."
-]
+"errors": {
+email:"Please provide a valid email address."
+}
 }
 ```
 
@@ -120,9 +118,9 @@ Email taken
 
 ```
 {
-"errors": [
-"An account has already been registered with that email address."
-]
+"errors": {
+email: "An account has already been registered with that email address."
+}
 }
 ```
 
@@ -162,20 +160,7 @@ Example Response:
 username: "salty_Dud3",
 id: 1,
 favorites: [
-{
-"id": 5493,
-"commenter_name": "Mr.Salty",
-"comment": " I hate puppies",
-"rating": 56.4345,
-"commenter_id": 402830
-},
-{
-"id": 2770,
-"commenter_name": "Mr.Salty",
-"comment": "Everybody on this forum sucks",
-"rating": 12.71,
-"commenter_id": 402830
-}
+342,673, 122, 560
 ],
 token: "fjbifjlbia4335.4534vsla32w.fwlfj4sfsarasafd8",
 }
@@ -201,8 +186,75 @@ No Username and/or Password in req.body
 ```
 
 {
+"errors": {
+username: "A username is required to log in.",
+password: "A password is required to log in.",
+
+}
+}
+
+```
+
+---
+
+### Users Overview
+
+| Method | Endpoint                   | Requires                                 | Description                                              |
+| ------ | -------------------------- | ---------------------------------------- | -------------------------------------------------------- |
+| GET    | `/api/users/:id/`          | Authentication Token                     | Returns user data.                                       |
+| DELETE | `/api/users/:id/`          | Authentication Token                     | Used to delete the user that is currently logged in.     |
+| DELETE | `/api/users/:id/favorites` | Authentication Token, comment - req.body | Used to delete a comment from the list of user favorites |
+| POST   | `/api/users/:id/favorites` | Authentication Token, comment - req.body | Used to add a comment to the user's favorites.           |
+
+---
+
+### Get User Data
+
+Method used: **[GET]** `/api/users/:id`
+
+On Success: Returns an object containing the user's data.
+
+Parameters:
+
+| Parameter Name | Location                  | Type   | Required |
+| -------------- | ------------------------- | ------ | -------- |
+| Auth Token     | req.headers.authorization | string | yes      |
+
+Example Response:
+
+```
+
+{
+  username: "salty_Dud3",
+id: 1,
+favorites: [
+342,673, 122, 560
+],
+}
+
+```
+
+Possible Errors:
+
+Invalid Token
+
+```
+
+{
 "errors": [
-"Username and Password are required to log in."
+"invalid token"
+]
+}
+
+```
+
+Not Authorized
+
+```
+
+{
+"errors": [
+"Not Authorized"
 ]
 }
 
@@ -210,6 +262,52 @@ No Username and/or Password in req.body
 
 ---
 
-```
+### Add Favorite
+
+Method used: **[POST]** `/api/users/:id/favorites`
+
+On Success: Returns an object containing the ID of the added comment.
+
+Parameters:
+
+| Parameter Name | Location | Type    | Required |
+| -------------- | -------- | ------- | -------- |
+| comment        | req.body | integer | yes      |
+
+Example Request:
+
+req.body
 
 ```
+
+{
+comment: 5,
+}
+
+```
+
+Example Response:
+
+```
+
+{
+comment: 5,
+}
+
+```
+
+Possible Errors:
+
+Invalid Token
+
+```
+
+{
+"errors": [
+"invalid token"
+]
+}
+
+```
+
+---

@@ -6,9 +6,9 @@ const { usersDML: kxu } = require('../db/dml')
 
 const baseURL = '/api/users/1'
 
-const { testUser, hashed } = require('./mock_data/user')
+const { token } = require('./mock_data/user')
 
-describe.skip('Tests for /user/:id/favorites', () => {
+describe('Tests for /user/:id/favorites', () => {
   beforeEach(async () => {
     await clearAndSeed(db)
   })
@@ -35,6 +35,16 @@ describe.skip('Tests for /user/:id/favorites', () => {
       .then(res => expect(res.status).not.toBe(404))
   })
 
+  test('Should be able to add a favorite', async () => {
+    return request(app)
+      .post(`${baseURL}/favorites`)
+      .set('authorization', token)
+      .send({ comment: 5 })
+      .then(res => {
+        expect(res.status).toBe(201)
+        expect(res.body.comment).toBe(5)
+      })
+  })
   test('DELETE route should exist for favorites', async () => {
     return request(app)
       .delete(`${baseURL}/favorites`)
