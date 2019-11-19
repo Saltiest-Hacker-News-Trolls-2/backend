@@ -2,7 +2,8 @@ const kx = require('../db_interface')
 
 module.exports = {
   register,
-  getFavorites
+  getFavorites,
+  checkRegistration
 }
 
 function register(user) {
@@ -14,6 +15,12 @@ function register(user) {
         .select(['id', 'username'])
         .first()
     })
+}
+
+function checkRegistration(username, email) {
+  return kx('users')
+    .where('username', username)
+    .orWhere('email', email)
 }
 
 function getFavorites(id) {
