@@ -1,14 +1,12 @@
 const app = require('../server/server')
 const request = require('supertest')
 const db = require('../db/db_interface')
-const generateJWT = require('../jwt/generateJWT')
 const clearAndSeed = require('./utils/clearAndSeed')
 const { usersDML: kxu } = require('../db/dml')
 
-const token = generateJWT({ id: 1 })
 const baseURL = '/api/users'
 
-const { testUser, hashed } = require('./mock_data/user')
+const { testUser, hashed, token } = require('./mock_data/user')
 
 describe('Tests for /user', () => {
   beforeEach(async () => {
@@ -37,7 +35,7 @@ describe('Tests for /user', () => {
       .then(res => expect(res.status).not.toBe(404))
   })
 
-  test('GET route return all user data', async () => {
+  test('GET route should return all user data', async () => {
     return request(app)
       .get(`${baseURL}/1`)
       .set('authorization', token)

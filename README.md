@@ -162,20 +162,7 @@ Example Response:
 username: "salty_Dud3",
 id: 1,
 favorites: [
-{
-"id": 5493,
-"commenter_name": "Mr.Salty",
-"comment": " I hate puppies",
-"rating": 56.4345,
-"commenter_id": 402830
-},
-{
-"id": 2770,
-"commenter_name": "Mr.Salty",
-"comment": "Everybody on this forum sucks",
-"rating": 12.71,
-"commenter_id": 402830
-}
+342,673, 122, 560
 ],
 token: "fjbifjlbia4335.4534vsla32w.fwlfj4sfsarasafd8",
 }

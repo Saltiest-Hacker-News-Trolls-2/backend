@@ -6,7 +6,7 @@ const clearAndSeed = require('./utils/clearAndSeed')
 const baseURL = '/api'
 const { testUser, hashed, joe } = require('./mock_data/user')
 
-describe.skip('Tests for onboarding process', () => {
+describe('Tests for onboarding process', () => {
   beforeEach(async () => {
     await clearAndSeed(db)
   })

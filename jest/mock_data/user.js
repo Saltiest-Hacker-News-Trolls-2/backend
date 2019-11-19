@@ -1,3 +1,5 @@
+const generateJWT = require('../../jwt/generateJWT')
+
 const testUser = {
   username: 'ned',
   email: 'ned@mail.com',
@@ -12,4 +14,6 @@ const joe = {
   password: 'joesmith'
 }
 
-module.exports = { testUser, hashed, joe }
+const token = generateJWT({ id: 1 })
+
+module.exports = { testUser, hashed, joe, token }

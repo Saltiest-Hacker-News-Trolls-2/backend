@@ -1,8 +1,9 @@
 const router = require('express').Router()
 const bcrypt = require('bcryptjs')
+const db = require('../db/db_interface')
 
 const { allPurpose: kxa, usersDML: kxu } = require('../db/dml')
-const { generalErr, restrictJWT } = require('../middleware')
+const { generalErr, restrictJWT, logErrors } = require('../middleware')
 
 router.get('/:id', restrictJWT, async (req, res, next) => {
   try {
@@ -31,5 +32,36 @@ router.delete('/:id', restrictJWT, async (req, res, next) => {
   }
 })
 
-router.use(generalErr)
+router.post('/:id/favorites', restrictJWT, async (req, res, next) => {
+  try {
+    const comment = req.body.comment
+    const id = req.params.id
+    //search for comment id in comments
+    const exists = await kxa.getOneBy({ id: comment }, 'comments')
+    //if found add row row to user_favorites
+    if (exists) {
+      const alreadySaved = await kxa.getOneBy(
+        { comment_id: comment, user_id: id },
+        'user_favorites'
+      )
+      !alreadySaved &&
+        (await kxa.add({ user_id: id, comment_id: comment }, 'user_favorites'))
+    } else {
+      //add comment to comments first
+      await kxa.add({ id: comment }, 'comments')
+      await kxa.add({ user_id: id, comment_id: comment }, 'user_favorites')
+    }
+    // return id of added comment
+    res.status(201).json({ comment })
+  } catch (err) {
+    next(err)
+  }
+})
+
+router.delete('/:id/favorites', restrictJWT, async (req, res, next) => {
+  // return id of removed comment
+  res.status(418)
+})
+
+router.use(logErrors, generalErr)
 module.exports = router
