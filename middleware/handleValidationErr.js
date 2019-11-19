@@ -6,9 +6,13 @@ const handleValidationErr = (req, res, next) => {
     return next()
   }
 
-  const formatted = errors.errors.reduce((errs, err) => {
-    return !errs.includes(err.msg) ? (errs = [...errs, err.msg]) : errs
-  }, [])
+  const formatted = {}
+  for (let [k, v] of Object.entries(errors.mapped())) {
+    if (formatted[k]) {
+      return
+    }
+    formatted[k] = v.msg
+  }
 
   return res.status(422).json({ errors: formatted })
 }

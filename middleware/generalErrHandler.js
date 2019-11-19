@@ -3,7 +3,10 @@ function errHandler(err, req, res, next) {
     default:
       return res
         .status(500)
-        .json({ errors: ['There was an error processing your request.'], err })
+        .json({
+          errors: [{ other: 'There was an error processing your request.' }],
+          err
+        })
   }
 }
 

@@ -38,13 +38,16 @@ router.post(
       if (err.constraint) {
         const constraint = err.constraint
         if (/username_unique/i.test(constraint)) {
-          res
-            .status(400)
-            .json({ errors: ['Sorry, that username is unavailable.'] })
+          res.status(400).json({
+            errors: [{ username: 'Sorry, that username is unavailable.' }]
+          })
         } else if (/email_unique/i.test(constraint)) {
           res.status(400).json({
             errors: [
-              'An account has already been registered with that email address.'
+              {
+                email:
+                  'An account has already been registered with that email address.'
+              }
             ]
           })
         }
@@ -79,7 +82,14 @@ router.post(
         return
       }
       // return error if username or password is incorrect
-      res.status(400).json({ errors: ['Invalid Credentials.'] })
+      res
+        .status(400)
+        .json({
+          errors: [
+            { username: 'Invalid Credentials.' },
+            { password: 'Invalid Credentials.' }
+          ]
+        })
     } catch (err) {
       console.log({ err })
       next({ ...err })

@@ -8,12 +8,10 @@ module.exports = {
 }
 
 function validateRegister() {
-  const missing = 'A username, password, and email are required to register.'
   return [
     body('username')
       .exists()
-      .withMessage(missing)
-      .bail()
+      .withMessage('A username is required.')
       .not()
       .matches(/[\W]/)
       .withMessage(
@@ -23,14 +21,12 @@ function validateRegister() {
       .withMessage('Username must be at least two characters.'),
     body('password')
       .exists()
-      .withMessage(missing)
-      .bail()
+      .withMessage('A password is required.')
       .isLength({ min: 6 })
       .withMessage('Password must be at least six characters.'),
     body('email')
       .exists()
-      .withMessage(missing)
-      .bail()
+      .withMessage('An email address is required.')
       .isEmail()
       .withMessage('Please provide a valid email address.')
       .trim()
@@ -41,10 +37,9 @@ function validateLogin() {
   return [
     body('username')
       .exists()
-      .withMessage('Username and Password are required to log in.'),
+      .withMessage('A username is required to log in.'),
     body('password')
       .exists()
-      .withMessage('Username and Password are required to log in.')
-    // search for user and compare password
+      .withMessage('A password is required to log in.')
   ]
 }
