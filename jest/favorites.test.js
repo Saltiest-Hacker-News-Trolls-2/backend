@@ -63,7 +63,7 @@ describe('Tests for /user/:id/favorites', () => {
       .send({ comment: 5 })
       .then(res => {
         expect(res.status).toBe(201)
-        expect(res.body.comment).toBe('5')
+        expect(res.body.favorites.length).toBe(5)
       })
   })
 
@@ -80,7 +80,7 @@ describe('Tests for /user/:id/favorites', () => {
       .send({ comment: 4 })
 
     expect(res.status).toBe(200)
-    expect(res.body.comment).toBe('4')
+    expect(res.body.favorites.length).toBe(3)
 
     return db('user_favorites')
       .where({ user_id: 1, comment_id: 4 })
