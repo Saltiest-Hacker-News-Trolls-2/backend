@@ -6,6 +6,8 @@ const { allPurpose: kxa, usersDML: kxu } = require('../db/dml')
 const generateJWT = require('../jwt/generateJWT')
 const secret = process.env.JWT_SECRET || 'mrAVEvn434RAC4kfdi&44'
 
+const createFavoritesArray = require('./createFavoritesArray')
+
 const {
   validateLogin,
   validateRegister
@@ -62,7 +64,7 @@ router.post(
       if (dbResult && bcrypt.compareSync(user.password, dbResult.password)) {
         // get user's favorites
         let favorites = await kxu.getFavorites(dbResult.id)
-        favorites = favorites.map(fav => fav.id)
+        favorites = createFavoritesArray(favorites)
         // generate token
         const token = generateJWT(dbResult)
         // return token

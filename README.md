@@ -421,7 +421,7 @@ _Not Authorized_
 
 Method used: **[POST]** `/api/users/:id/favorites`
 
-On Success: Returns an object containing the ID of the added comment.
+On Success: Returns an updated list of the user's favorites.
 
 Parameters:
 
@@ -436,7 +436,7 @@ req.body
 ```
 
 {
-comment: 5,
+  comment: 5,
 }
 
 ```
@@ -446,7 +446,7 @@ comment: 5,
 ```
 
 {
-comment: 5,
+  favorites: [1,2,3,4,5],
 }
 
 ```
@@ -495,7 +495,7 @@ _Comment ID is not an integer_
 
 Method used: **[DELETE]** `/api/users/:id/favorites`
 
-On Success: Returns an object containing the ID of the deleted comment.
+On Success: Returns an updated list of the user's favorites.
 
 Parameters:
 
@@ -510,7 +510,7 @@ req.body
 ```
 
 {
-comment: 5,
+comment: 3,
 }
 
 ```
@@ -520,7 +520,7 @@ comment: 5,
 ```
 
 {
-comment: 5,
+favorites: [ 1,2,4],
 }
 
 ```
