@@ -26,7 +26,7 @@ The base URL is:
 
 ## Endpoints
 
-Quick Links: [Onboarding Overview](#onboarding-overview) | [Users Overview](#users-overview) | [Favorites Overview](#favorites-overview)
+Quick Links: [ Error overview](#error-overview) | [Onboarding Overview](#onboarding-overview) | [Users Overview](#users-overview) | [Favorites Overview](#favorites-overview)
 
 ### Onboarding Overview
 
@@ -34,6 +34,49 @@ Quick Links: [Onboarding Overview](#onboarding-overview) | [Users Overview](#use
 | ------ | ---------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
 | POST   | `/api/register/` | `email address`- req.body, `username`- req.body, `password`- req.body | Used for adding a new user to the database. Returns an object containing user data and a JWT token. |
 | POST   | `/api/login/`    | `username` - req.body, `password`- req.body                           | Used to log a user in. Returns an object containing user data and a JWT token.                      |
+
+---
+
+### Error Overview
+
+#### Using Axios
+
+When making requests to this API with Axios error messages can found on `error.response.data.errors`.
+
+Example POST request:
+
+```
+axios
+      .post("https://only-salty-hackers.herokuapp.com/api/login", {
+         username,
+        password
+      })
+      .then(res => console.log(res.data))
+      .catch(err => {
+        console.log(err.response.data.errors)
+        });
+```
+
+#### Using Fetch
+
+When making requests with the Fetch API error messages can be found on `response.errors`.
+
+```
+fetch("https://only-salty-hackers.herokuapp.com/api/login",{
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ username, password})
+        }).then(res => res.json())
+        .then( data => {
+          if(data.errors){
+            console.log(data.errors)
+            }
+          console.log(data)
+          })
+        .catch(err => console.log('Network Error',err))
+```
 
 ---
 
@@ -51,7 +94,7 @@ Parameters:
 | password       | req.body | string | yes      | Min-Length: 6, Max-Length: 60 , Must contain at least one number, one word character, and one special character from this list: [ %,^,*,$,@,#,!] |
 | email          | req.body | string | yes      | Will be checked for valid format.                                                                                                                |
 
-Example Request:
+#### Example Request:
 
 ```
 {
@@ -61,7 +104,7 @@ Example Request:
 }
 ```
 
-Example Response:
+#### Example Response:
 
 ```
 {
@@ -72,7 +115,7 @@ Example Response:
 }
 ```
 
-Possible Errors:
+#### Possible Errors:
 
 Missing username, password , or email in req.body
 
@@ -86,7 +129,7 @@ Missing username, password , or email in req.body
 }
 ```
 
-Invalid characters in username
+_Invalid characters in username_
 
 ```
 {
@@ -96,7 +139,7 @@ Invalid characters in username
 }
 ```
 
-Username taken.
+_Username taken._
 
 ```
 {
@@ -141,7 +184,7 @@ Parameters:
 | username       | req.body | string | yes      |
 | password       | req.body | string | yes      |
 
-Example Request:
+#### Example Request:
 
 req.body
 
@@ -154,7 +197,7 @@ password: "n4J3%Lp",
 
 ```
 
-Example Response:
+#### Example Response:
 
 ```
 
@@ -169,9 +212,9 @@ token: "fjbifjlbia4335.4534vsla32w.fwlfj4sfsarasafd8",
 
 ```
 
-Possible Errors:
+#### Possible Errors:
 
-Invalid Username and/or Password
+_Invalid Username and/or Password_
 
 ```
 
@@ -183,7 +226,7 @@ Invalid Username and/or Password
 
 ```
 
-No Username and/or Password in req.body
+_No Username and/or Password in req.body_
 
 ```
 
@@ -220,7 +263,7 @@ Parameters:
 | -------------- | ------------------------- | ------ | -------- |
 | Auth Token     | req.headers.authorization | string | yes      |
 
-Example Response:
+#### Example Response:
 
 ```
 
@@ -234,9 +277,9 @@ favorites: [
 
 ```
 
-Possible Errors:
+#### Possible Errors:
 
-Invalid Token
+_Invalid Token_
 
 ```
 
@@ -248,7 +291,7 @@ Invalid Token
 
 ```
 
-Not Authorized
+_Not Authorized_
 
 ```
 
@@ -272,7 +315,7 @@ Parameters:
 | -------------- | ------------------------- | ------ | -------- |
 | Auth Token     | req.headers.authorization | string | yes      |
 
-Example Response:
+#### Example Response:
 
 ```
 
@@ -282,9 +325,9 @@ Example Response:
 
 ```
 
-Possible Errors:
+#### Possible Errors:
 
-Invalid Token
+_Invalid Token_
 
 ```
 
@@ -296,7 +339,7 @@ Invalid Token
 
 ```
 
-Not Authorized
+_Not Authorized_
 
 ```
 
@@ -334,7 +377,7 @@ Parameters:
 | -------------- | ------------------------- | ------ | -------- |
 | Auth Token     | req.headers.authorization | string | yes      |
 
-Example Response:
+#### Example Response:
 
 ```
 
@@ -346,9 +389,9 @@ favorites: [
 
 ```
 
-Possible Errors:
+#### Possible Errors:
 
-Invalid Token
+_Invalid Token_
 
 ```
 
@@ -360,7 +403,7 @@ Invalid Token
 
 ```
 
-Not Authorized
+_Not Authorized_
 
 ```
 
@@ -386,7 +429,7 @@ Parameters:
 | -------------- | -------- | ------- | -------- |
 | comment        | req.body | integer | yes      |
 
-Example Request:
+#### Example Request:
 
 req.body
 
@@ -398,7 +441,7 @@ comment: 5,
 
 ```
 
-Example Response:
+#### Example Response:
 
 ```
 
@@ -408,9 +451,9 @@ comment: 5,
 
 ```
 
-Possible Errors:
+#### Possible Errors:
 
-Invalid Token
+_Invalid Token_
 
 ```
 
@@ -422,7 +465,7 @@ Invalid Token
 
 ```
 
-Comment ID was not provided
+_Comment ID was not provided_
 
 ```
 
@@ -434,7 +477,7 @@ Comment ID was not provided
 
 ```
 
-Comment ID is not an integer
+_Comment ID is not an integer_
 
 ```
 
@@ -460,7 +503,7 @@ Parameters:
 | -------------- | -------- | ------- | -------- |
 | comment        | req.body | integer | yes      |
 
-Example Request:
+#### Example Request:
 
 req.body
 
@@ -472,7 +515,7 @@ comment: 5,
 
 ```
 
-Example Response:
+#### Example Response:
 
 ```
 
@@ -482,9 +525,9 @@ comment: 5,
 
 ```
 
-Possible Errors:
+#### Possible Errors:
 
-Invalid Token
+_Invalid Token_
 
 ```
 
@@ -496,7 +539,7 @@ errors: [
 
 ```
 
-Comment ID was not provided
+_Comment ID was not provided_
 
 ```
 
@@ -508,7 +551,7 @@ Comment ID was not provided
 
 ```
 
-Comment ID is not an integer
+_Comment ID is not an integer_
 
 ```
 
