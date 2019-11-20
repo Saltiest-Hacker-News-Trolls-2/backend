@@ -149,7 +149,7 @@ _Username taken._
 }
 ```
 
-Invalid email address format
+_Invalid email address format_
 
 ```
 {
@@ -159,7 +159,7 @@ email:"Please provide a valid email address."
 }
 ```
 
-Email taken
+_Email taken_
 
 ```
 {
