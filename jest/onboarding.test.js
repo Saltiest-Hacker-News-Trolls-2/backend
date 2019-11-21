@@ -1,18 +1,12 @@
 const app = require('../server/server')
 const request = require('supertest')
 const db = require('../db/db_interface')
-const { clearTables } = require('./utils/setup')
 
 const baseURL = '/api'
-const { testUser, hashedUser, joe } = require('./mock_data/data')
+const { testUser, joe } = require('./mock_data/data')
 
 beforeEach(async done => {
-  // clear tables
-  await db('user_favorites').del()
-  await db('users').del()
-  await db('comments').del()
-  // reset auto-generated id's
-  await db.raw('TRUNCATE TABLE users RESTART IDENTITY CASCADE')
+  await db.seed.run()
   done()
 })
 
@@ -22,15 +16,6 @@ describe('Tests for onboarding process', () => {
   test('Environment should be "test"', done => {
     expect(process.env.NODE_ENV).toBe('test')
     done()
-  })
-
-  test('db should be empty', async () => {
-    const users = await db('users')
-    const comments = await db('comments')
-    const favorites = await db('user_favorites')
-    expect(users.length).toBe(0)
-    expect(comments.length).toBe(0)
-    expect(favorites.length).toBe(0)
   })
 
   describe('Tests for /register', () => {
@@ -111,7 +96,7 @@ describe('Tests for onboarding process', () => {
         })
     })
 
-    test.skip('Should store usernames in lowercase', async done => {
+    test('Should store usernames in lowercase', async done => {
       // register new user
       const res = await request(app)
         .post(`${baseURL}/register`)
@@ -138,8 +123,6 @@ describe('Tests for onboarding process', () => {
     })
 
     test('Should not allow duplicate usernames', async done => {
-      await db('users').del()
-      await db('users').insert(testUser, '*')
       // try to add invalid user
       const res = await request(app)
         .post(`${baseURL}/register`)
@@ -153,13 +136,6 @@ describe('Tests for onboarding process', () => {
     })
 
     test('Should not allow duplicate emails', async done => {
-      //db should be empty
-      db('users').then(res => expect(res.length).toBe(0))
-
-      // add user to db
-      db('users')
-        .insert(testUser)
-        .then(res => expect(res.length).toBe(1))
       // try to add user again
       const res = await request(app)
         .post(`${baseURL}/register`)
@@ -173,13 +149,10 @@ describe('Tests for onboarding process', () => {
     })
 
     test('Password must  be at least six characters', async done => {
-      //db should be empty
-      db('users').then(res => expect(res.length).toBe(0))
-
       // register new user
       const res = await request(app)
         .post(`${baseURL}/register`)
-        .send({ ...testUser, password: 'z' })
+        .send({ ...joe, password: 'z' })
 
       // assert correct response
       expect(res.status).toBe(422)
@@ -201,12 +174,6 @@ describe('Tests for onboarding process', () => {
     })
 
     test('should return token if password is correct', async done => {
-      //db should be empty
-      db('users').then(res => expect(res.length).toBe(0))
-      //add user to db
-      await db('users').insert(hashedUser, '*')
-      db('users').then(res => expect(res.length).toBe(1))
-
       const loginResult = await request(app)
         .post(`${baseURL}/login`)
         .send({ password: testUser.password, username: testUser.username })
@@ -221,12 +188,6 @@ describe('Tests for onboarding process', () => {
     })
 
     test('Should return error if password is incorrect', async () => {
-      //db should be empty
-      db('users').then(res => expect(res.length).toBe(0))
-      //add user to db
-      await db('users').insert(hashedUser, '*')
-      db('users').then(res => expect(res.length).toBe(1))
-
       // try to login
       return request(app)
         .post(`${baseURL}/login`)
@@ -238,12 +199,6 @@ describe('Tests for onboarding process', () => {
     })
 
     test('Should return error if username is incorrect', async () => {
-      //db should be empty
-      db('users').then(res => expect(res.length).toBe(0))
-      //add user to db
-      await db('users').insert(hashedUser, '*')
-      db('users').then(res => expect(res.length).toBe(1))
-
       // try to login
       return request(app)
         .post(`${baseURL}/login`)
