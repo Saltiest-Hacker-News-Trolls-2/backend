@@ -1,26 +1,15 @@
 const app = require('../server/server')
 const request = require('supertest')
 const db = require('../db/db_interface')
-const {
-  clearTables,
-  clearKXCleaner,
-  addTestUser,
-  addTestComments,
-  addTestFavorites
-} = require('./utils/setup')
 
 const { usersDML: kxu } = require('../db/dml')
 
 const baseURL = '/api/users/1'
 
-const { token, comments, favorites, hashedUser } = require('./mock_data/data')
+const { token } = require('./mock_data/data')
 
 beforeEach(async done => {
-  await db('user_favorites').del()
-  await db('users').del()
-  await db('comments').del()
-  // reset auto-generated id's
-  await db.raw('TRUNCATE TABLE users RESTART IDENTITY CASCADE')
+  await db.seed.run()
   done()
 })
 
@@ -59,10 +48,6 @@ describe('Tests for /user/:id/favorites', () => {
   })
 
   test('Should be able to add a favorite', async () => {
-    const u = await db('users').insert(hashedUser, '*')
-    const c = await db('comments').insert(comments, '*')
-    const f = await db('user_favorites').insert(favorites, '*')
-
     return request(app)
       .post(`${baseURL}/favorites`)
       .set('authorization', token)
@@ -80,10 +65,6 @@ describe('Tests for /user/:id/favorites', () => {
   })
 
   test('Should be able to delete a favorite', async () => {
-    const u = await db('users').insert(hashedUser, '*')
-    const c = await db('comments').insert(comments, '*')
-    const f = await db('user_favorites').insert(favorites, '*')
-
     const res = await request(app)
       .delete(`${baseURL}/favorites`)
       .set('authorization', token)
@@ -127,10 +108,6 @@ describe('Tests for /user/:id/favorites', () => {
   })
 
   test("Should return list of user's favorites", async () => {
-    await db('users').insert(hashedUser)
-    await db('comments').insert(comments)
-    await db('user_favorites').insert(favorites)
-
     return request(app)
       .get(`${baseURL}/favorites`)
       .set('authorization', token)
@@ -142,10 +119,6 @@ describe('Tests for /user/:id/favorites', () => {
   })
 
   test('Test getFavorites() function ', async done => {
-    const u = await db('users').insert(hashedUser, '*')
-    const c = await db('comments').insert(comments, '*')
-    const f = await db('user_favorites').insert(favorites, '*')
-
     // try to get user's favorites
     const userFavorites = await kxu.getFavorites(1)
     expect(userFavorites.length).toBe(4)
