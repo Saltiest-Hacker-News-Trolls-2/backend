@@ -17,10 +17,18 @@ The base URL is:
 ## Getting Started (Local)
 
 - run `npm i && npm i -D` in order to install all dependencies
+- create a .env file with the following fields:
+  - DB_DEV_HOST host name of local postgres server
+  - DB_DEV_PORT port for local postgres server
+  - DB_DEV_DB - the database to use for local development(Postman/ Insomnia testing)
+  - DB_TEST_DB - the database to use for running tests
+  - DB_DEV_USER username for local postgres server
+  - DB_DEV_PW password for local postgres server
+  - JWT_SECRET used to generate/ authorize tokens
 - create two databases on your local device 'saltiest' and 'saltiest-test'
 - `createdb saltiest && createdb saltiest-test`
 - create database tables with `[npx] knex migrate:latest --env=development && [npx] knex migrate:latest --env=test`
-- seed database with `[npx] knex seed:run --env=development && [npx] knex seed:run --env=test`
+- seed database with `[npx] knex seed:run --env=development` . The test database does not need to be seeded.
 - use the command `npm run dev` to run the server locally using the 'development' environment settings
 - use the command `npm run test` to run the test files using the 'test' environment settings
 
@@ -73,7 +81,9 @@ fetch("https://only-salty-hackers.herokuapp.com/api/login",{
           if(data.errors){
             console.log(data.errors)
             }
-          console.log(data)
+          else{
+            console.log(data)
+          }
           })
         .catch(err => console.log('Network Error',err))
 ```

@@ -1,8 +1,8 @@
-require("dotenv").config();
+require('dotenv').config()
 
 module.exports = {
   development: {
-    client: "pg",
+    client: 'pg',
     useNullAsDefault: true,
     connection: {
       database: process.env.DB_DEV_DB,
@@ -11,14 +11,14 @@ module.exports = {
       password: process.env.DB_DEV_PW
     },
     migrations: {
-      directory: "./db/migrations"
+      directory: './db/migrations'
     },
     seeds: {
-      directory: "./db/seeds"
+      directory: './db/seeds'
     }
   },
   test: {
-    client: "pg",
+    client: 'pg',
     useNullAsDefault: true,
     connection: {
       database: process.env.DB_TEST_DB,
@@ -27,30 +27,14 @@ module.exports = {
       password: process.env.DB_DEV_PW
     },
     migrations: {
-      directory: "./db/migrations"
+      directory: './db/migrations'
     },
     seeds: {
-      directory: "./db/seeds"
-    }
-  },
-  staging: {
-    client: "pg",
-    connection: process.env.DATABASE_URL,
-    ssl: true,
-    pool: {
-      min: 2,
-      max: 10
-    },
-    migrations: {
-      tableName: "knex_migrations",
-      directory: "./db/migrations"
-    },
-    seeds: {
-      directory: "./db/seeds"
+      directory: './db/seeds'
     }
   },
   production: {
-    client: "pg",
+    client: 'pg',
     connection: process.env.DATABASE_URL,
     ssl: true,
     pool: {
@@ -58,11 +42,11 @@ module.exports = {
       max: 10
     },
     migrations: {
-      tableName: "knex_migrations",
-      directory: "./db/migrations"
+      tableName: 'knex_migrations',
+      directory: './db/migrations'
     },
     seeds: {
-      directory: "./db/seeds"
+      directory: './db/seeds'
     }
   }
-};
+}

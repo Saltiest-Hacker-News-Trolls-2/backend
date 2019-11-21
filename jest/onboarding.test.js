@@ -1,30 +1,36 @@
 const app = require('../server/server')
 const request = require('supertest')
 const db = require('../db/db_interface')
-const clearAndSeed = require('./utils/clearAndSeed')
+const { clearTables } = require('./utils/setup')
 
 const baseURL = '/api'
-const { testUser, hashed, joe } = require('./mock_data/user')
+const { testUser, hashedUser, joe } = require('./mock_data/data')
+
+beforeEach(async done => {
+  // clear tables
+  await db('user_favorites').del()
+  await db('users').del()
+  await db('comments').del()
+  // reset auto-generated id's
+  await db.raw('TRUNCATE TABLE users RESTART IDENTITY CASCADE')
+  done()
+})
 
 describe('Tests for onboarding process', () => {
-  beforeEach(async () => {
-    await clearAndSeed(db)
-  })
+  console.log('running onboarding tests')
 
-  test('Environment should be "test"', () => {
+  test('Environment should be "test"', done => {
     expect(process.env.NODE_ENV).toBe('test')
+    done()
   })
 
-  test('Verify dabase connection', async () => {
+  test('db should be empty', async () => {
     const users = await db('users')
-    expect(users.length).toBe(1)
-    expect(users[0].username).toBe('ned')
-
     const comments = await db('comments')
-    expect(comments.length).toBe(4)
-
     const favorites = await db('user_favorites')
-    expect(favorites.length).toBe(4)
+    expect(users.length).toBe(0)
+    expect(comments.length).toBe(0)
+    expect(favorites.length).toBe(0)
   })
 
   describe('Tests for /register', () => {
@@ -37,7 +43,7 @@ describe('Tests for onboarding process', () => {
         })
     })
 
-    test('Should be able to register new user', async () => {
+    test('Should be able to register new user', async done => {
       const res = await request(app)
         .post(`${baseURL}/register`)
         .send(joe)
@@ -46,7 +52,7 @@ describe('Tests for onboarding process', () => {
       expect(res.body.username).toBeDefined()
       expect(res.body.id).toBeDefined()
       expect(res.body.token).toBeDefined()
-      // assert database was updated
+      done()
     })
 
     test('Should return error if username is not provided', () => {
@@ -105,7 +111,7 @@ describe('Tests for onboarding process', () => {
         })
     })
 
-    test('Should store usernames in lowercase', async () => {
+    test.skip('Should store usernames in lowercase', async done => {
       // register new user
       const res = await request(app)
         .post(`${baseURL}/register`)
@@ -114,9 +120,10 @@ describe('Tests for onboarding process', () => {
       // assert correct response
       expect(res.status).toBe(201)
       expect(res.body.username).toBe('joe')
+      done()
     })
 
-    test('Usernames must be at least two characters', async () => {
+    test('Usernames must be at least two characters', async done => {
       // register new user
       const res = await request(app)
         .post(`${baseURL}/register`)
@@ -127,9 +134,12 @@ describe('Tests for onboarding process', () => {
       expect(res.body.errors.username).toMatch(
         /username must be at least two characters/i
       )
+      done()
     })
 
-    test('Should not allow duplicate usernames', async () => {
+    test('Should not allow duplicate usernames', async done => {
+      await db('users').del()
+      await db('users').insert(testUser, '*')
       // try to add invalid user
       const res = await request(app)
         .post(`${baseURL}/register`)
@@ -139,9 +149,10 @@ describe('Tests for onboarding process', () => {
       expect(res.body.errors.username).toMatch(
         /sorry, that username is unavailable./i
       )
+      done()
     })
 
-    test('Should not allow duplicate emails', async () => {
+    test('Should not allow duplicate emails', async done => {
       //db should be empty
       db('users').then(res => expect(res.length).toBe(0))
 
@@ -158,9 +169,10 @@ describe('Tests for onboarding process', () => {
       expect(res.body.errors.email).toMatch(
         /an account has already been registered with that email address./i
       )
+      done()
     })
 
-    test('Password must  be at least six characters', async () => {
+    test('Password must  be at least six characters', async done => {
       //db should be empty
       db('users').then(res => expect(res.length).toBe(0))
 
@@ -174,6 +186,7 @@ describe('Tests for onboarding process', () => {
       expect(res.body.errors.password).toMatch(
         /password must be at least six characters/i
       )
+      done()
     })
   }) // end test for register
 
@@ -187,7 +200,13 @@ describe('Tests for onboarding process', () => {
         })
     })
 
-    test('should return token if password is correct', async () => {
+    test('should return token if password is correct', async done => {
+      //db should be empty
+      db('users').then(res => expect(res.length).toBe(0))
+      //add user to db
+      await db('users').insert(hashedUser, '*')
+      db('users').then(res => expect(res.length).toBe(1))
+
       const loginResult = await request(app)
         .post(`${baseURL}/login`)
         .send({ password: testUser.password, username: testUser.username })
@@ -196,11 +215,18 @@ describe('Tests for onboarding process', () => {
       expect(loginResult.status).toBe(200)
       expect(loginResult.body.username).toMatch(/ned/i)
       expect(loginResult.body.id).toBeDefined()
-      expect(loginResult.body.favorites.length).toBe(4)
+      expect(loginResult.body.favorites).toBeDefined()
       expect(loginResult.body.token).toBeDefined()
+      done()
     })
 
     test('Should return error if password is incorrect', async () => {
+      //db should be empty
+      db('users').then(res => expect(res.length).toBe(0))
+      //add user to db
+      await db('users').insert(hashedUser, '*')
+      db('users').then(res => expect(res.length).toBe(1))
+
       // try to login
       return request(app)
         .post(`${baseURL}/login`)
@@ -212,6 +238,12 @@ describe('Tests for onboarding process', () => {
     })
 
     test('Should return error if username is incorrect', async () => {
+      //db should be empty
+      db('users').then(res => expect(res.length).toBe(0))
+      //add user to db
+      await db('users').insert(hashedUser, '*')
+      db('users').then(res => expect(res.length).toBe(1))
+
       // try to login
       return request(app)
         .post(`${baseURL}/login`)
