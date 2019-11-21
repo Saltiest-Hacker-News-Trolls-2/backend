@@ -1,12 +1,3 @@
 exports.seed = function(knex) {
-  return knex('comments')
-    .del()
-    .then(function() {
-      return knex('comments').insert([
-        { id: 1 },
-        { id: 2 },
-        { id: 3 },
-        { id: 4 }
-      ])
-    })
+  return knex('comments').insert([{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }])
 }

@@ -73,7 +73,9 @@ fetch("https://only-salty-hackers.herokuapp.com/api/login",{
           if(data.errors){
             console.log(data.errors)
             }
-          console.log(data)
+          else{
+            console.log(data)
+          }
           })
         .catch(err => console.log('Network Error',err))
 ```

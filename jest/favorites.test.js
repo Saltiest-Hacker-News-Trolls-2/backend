@@ -1,32 +1,34 @@
 const app = require('../server/server')
 const request = require('supertest')
 const db = require('../db/db_interface')
-const clearAndSeed = require('./utils/clearAndSeed')
+const {
+  clearTables,
+  clearKXCleaner,
+  addTestUser,
+  addTestComments,
+  addTestFavorites
+} = require('./utils/setup')
+
 const { usersDML: kxu } = require('../db/dml')
 
 const baseURL = '/api/users/1'
 
-const { token } = require('./mock_data/user')
+const { token, comments, favorites, hashedUser } = require('./mock_data/data')
+
+beforeEach(async done => {
+  await db('user_favorites').del()
+  await db('users').del()
+  await db('comments').del()
+  // reset auto-generated id's
+  await db.raw('TRUNCATE TABLE users RESTART IDENTITY CASCADE')
+  done()
+})
 
 describe('Tests for /user/:id/favorites', () => {
-  beforeEach(async () => {
-    await clearAndSeed(db)
-  })
+  console.log('running favorites tests')
 
   test('Environment should be "test"', () => {
     expect(process.env.NODE_ENV).toBe('test')
-  })
-
-  test('Verify dabase connection', async () => {
-    const users = await db('users')
-    expect(users.length).toBe(1)
-    expect(users[0].username).toBe('ned')
-
-    const comments = await db('comments')
-    expect(comments.length).toBe(4)
-
-    const favorites = await db('user_favorites')
-    expect(favorites.length).toBe(4)
   })
 
   test('POST route should exist for favorites', async () => {
@@ -57,6 +59,10 @@ describe('Tests for /user/:id/favorites', () => {
   })
 
   test('Should be able to add a favorite', async () => {
+    const u = await db('users').insert(hashedUser, '*')
+    const c = await db('comments').insert(comments, '*')
+    const f = await db('user_favorites').insert(favorites, '*')
+
     return request(app)
       .post(`${baseURL}/favorites`)
       .set('authorization', token)
@@ -74,16 +80,20 @@ describe('Tests for /user/:id/favorites', () => {
   })
 
   test('Should be able to delete a favorite', async () => {
+    const u = await db('users').insert(hashedUser, '*')
+    const c = await db('comments').insert(comments, '*')
+    const f = await db('user_favorites').insert(favorites, '*')
+
     const res = await request(app)
       .delete(`${baseURL}/favorites`)
       .set('authorization', token)
-      .send({ comment: 4 })
+      .send({ comment: 3 })
 
     expect(res.status).toBe(200)
     expect(res.body.favorites.length).toBe(3)
 
     return db('user_favorites')
-      .where({ user_id: 1, comment_id: 4 })
+      .where({ user_id: 1, comment_id: 3 })
       .then(data => {
         expect(data.length).toBe(0)
       })
@@ -110,13 +120,17 @@ describe('Tests for /user/:id/favorites', () => {
       })
   })
 
-  test('GET route should exist for favorites', async () => {
+  test('GET route should exist for favorites', () => {
     return request(app)
       .get(`${baseURL}/favorites`)
       .then(res => expect(res.status).not.toBe(404))
   })
 
   test("Should return list of user's favorites", async () => {
+    await db('users').insert(hashedUser)
+    await db('comments').insert(comments)
+    await db('user_favorites').insert(favorites)
+
     return request(app)
       .get(`${baseURL}/favorites`)
       .set('authorization', token)
@@ -125,5 +139,16 @@ describe('Tests for /user/:id/favorites', () => {
         expect(res.body.favorites).toBeDefined()
         expect(res.body.favorites.length).toBe(4)
       })
+  })
+
+  test('Test getFavorites() function ', async done => {
+    const u = await db('users').insert(hashedUser, '*')
+    const c = await db('comments').insert(comments, '*')
+    const f = await db('user_favorites').insert(favorites, '*')
+
+    // try to get user's favorites
+    const userFavorites = await kxu.getFavorites(1)
+    expect(userFavorites.length).toBe(4)
+    done()
   })
 })
