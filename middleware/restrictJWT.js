@@ -9,12 +9,14 @@ module.exports = (req, res, next) => {
     jwt.verify(token, secret, (err, decoded) => {
       if (err) {
         res.status(400).json({ message: 'Not Authorized' })
+      } else if (Number(decoded.subject) !== Number(id)) {
+        res.status(400).json({ message: 'Not Authorized' })
       } else {
         req.headers.subject = decoded.subject
         next()
       }
     })
   } catch (err) {
-    res.status(400).json({ errors: [err.message] })
+    next(err)
   }
 }
