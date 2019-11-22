@@ -6,14 +6,14 @@ module.exports = (req, res, next) => {
     const id = req.params.id
     let token = req.headers.authorization
 
-    const { subject } = jwt.verify(token, secret)
-    // id in token must match request.params
-    if (Number(subject) !== Number(id)) {
-      throw new Error('Not Authorized.')
-    }
-
-    req.headers.subject = subject
-    next()
+    jwt.verify(token, secret, (err, decoded) => {
+      if (err) {
+        res.status(400).json({ message: 'Not Authorized' })
+      } else {
+        req.headers.subject = decoded.subject
+        next()
+      }
+    })
   } catch (err) {
     res.status(400).json({ errors: [err.message] })
   }
