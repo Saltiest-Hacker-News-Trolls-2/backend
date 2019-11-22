@@ -98,11 +98,11 @@ On Success: Returns an object containing user data and a JWT token.
 
 Parameters:
 
-| Parameter Name | Location | Type   | Required | Restrictions                                                                                                                                     |
-| -------------- | -------- | ------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| username       | req.body | string | yes      | Unique: true, Min-Length: 2, Max-Length: 50 , May only contain letters, numbers, and underscores                                                 |
-| password       | req.body | string | yes      | Min-Length: 6, Max-Length: 60 , Must contain at least one number, one word character, and one special character from this list: [ %,^,*,$,@,#,!] |
-| email          | req.body | string | yes      | Will be checked for valid format.                                                                                                                |
+| Parameter Name | Location | Type   | Required | Restrictions                                                                                     |
+| -------------- | -------- | ------ | -------- | ------------------------------------------------------------------------------------------------ |
+| username       | req.body | string | yes      | Unique: true, Min-Length: 2, Max-Length: 50 , May only contain letters, numbers, and underscores |
+| password       | req.body | string | yes      | Min-Length: 6, Max-Length: 60                                                                    |
+| email          | req.body | string | yes      | Will be checked for valid format.                                                                |
 
 #### Example Request:
 
