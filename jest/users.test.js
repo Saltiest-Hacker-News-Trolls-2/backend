@@ -40,7 +40,7 @@ describe('Tests for /user', () => {
       .set('authorization', token)
       .then(res => {
         expect(res.status).toBe(400)
-        expect(res.body.errors[0]).toMatch(/not authorized/i)
+        expect(res.body.message).toMatch(/not authorized/i)
       })
   })
 
